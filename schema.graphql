@@ -1,0 +1,178 @@
+type AccrueInterest @entity(immutable: true) {
+  id: Bytes!
+  cashPrior: BigInt! # uint256
+  interestAccumulated: BigInt! # uint256
+  borrowIndex: BigInt! # uint256
+  totalBorrows: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Approval @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  spender: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Borrow @entity(immutable: true) {
+  id: Bytes!
+  borrower: Bytes! # address
+  borrowAmount: BigInt! # uint256
+  accountBorrows: BigInt! # uint256
+  totalBorrows: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Failure @entity(immutable: true) {
+  id: Bytes!
+  error: BigInt! # uint256
+  info: BigInt! # uint256
+  detail: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type LiquidateBorrow @entity(immutable: true) {
+  id: Bytes!
+  liquidator: Bytes! # address
+  borrower: Bytes! # address
+  repayAmount: BigInt! # uint256
+  rTokenCollateral: Bytes! # address
+  seizeTokens: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Mint @entity(immutable: true) {
+  id: Bytes!
+  minter: Bytes! # address
+  mintAmount: BigInt! # uint256
+  mintTokens: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type NewAdmin @entity(immutable: true) {
+  id: Bytes!
+  oldAdmin: Bytes! # address
+  newAdmin: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type NewComptroller @entity(immutable: true) {
+  id: Bytes!
+  oldComptroller: Bytes! # address
+  newComptroller: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type NewMarketInterestRateModel @entity(immutable: true) {
+  id: Bytes!
+  oldInterestRateModel: Bytes! # address
+  newInterestRateModel: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type NewPendingAdmin @entity(immutable: true) {
+  id: Bytes!
+  oldPendingAdmin: Bytes! # address
+  newPendingAdmin: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type NewProtocolSeizeShare @entity(immutable: true) {
+  id: Bytes!
+  oldProtocolSeizeShareMantissa: BigInt! # uint256
+  newProtocolSeizeShareMantissa: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type NewRedemptionReserveFactor @entity(immutable: true) {
+  id: Bytes!
+  oldRedemptionReserveFactor: BigInt! # uint256
+  newRedemptionReserveFactor: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type NewReserveFactor @entity(immutable: true) {
+  id: Bytes!
+  oldReserveFactorMantissa: BigInt! # uint256
+  newReserveFactorMantissa: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Redeem @entity(immutable: true) {
+  id: Bytes!
+  redeemer: Bytes! # address
+  redeemAmount: BigInt! # uint256
+  redeemTokens: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RepayBorrow @entity(immutable: true) {
+  id: Bytes!
+  payer: Bytes! # address
+  borrower: Bytes! # address
+  repayAmount: BigInt! # uint256
+  accountBorrows: BigInt! # uint256
+  totalBorrows: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ReservesAdded @entity(immutable: true) {
+  id: Bytes!
+  benefactor: Bytes! # address
+  addAmount: BigInt! # uint256
+  newTotalReserves: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ReservesReduced @entity(immutable: true) {
+  id: Bytes!
+  admin: Bytes! # address
+  reduceAmount: BigInt! # uint256
+  newTotalReserves: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Transfer @entity(immutable: true) {
+  id: Bytes!
+  from: Bytes! # address
+  to: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

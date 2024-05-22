@@ -1,0 +1,77 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: rSTONE
+    network: scroll-sepolia
+    source:
+      address: "0x9f326731257a9B4a138B41590E70A10e00b5e6d8"
+      abi: rSTONE
+      startBlock: 4349177
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AccrueInterest
+        - Approval
+        - Borrow
+        - Failure
+        - LiquidateBorrow
+        - Mint
+        - NewAdmin
+        - NewComptroller
+        - NewMarketInterestRateModel
+        - NewPendingAdmin
+        - NewProtocolSeizeShare
+        - NewRedemptionReserveFactor
+        - NewReserveFactor
+        - Redeem
+        - RepayBorrow
+        - ReservesAdded
+        - ReservesReduced
+        - Transfer
+      abis:
+        - name: rSTONE
+          file: ./abis/rSTONE.json
+      eventHandlers:
+        - event: AccrueInterest(uint256,uint256,uint256,uint256)
+          handler: handleAccrueInterest
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: Failure(uint256,uint256,uint256)
+          handler: handleFailure
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: NewAdmin(address,address)
+          handler: handleNewAdmin
+        - event: NewComptroller(address,address)
+          handler: handleNewComptroller
+        - event: NewMarketInterestRateModel(address,address)
+          handler: handleNewMarketInterestRateModel
+        - event: NewPendingAdmin(address,address)
+          handler: handleNewPendingAdmin
+        - event: NewProtocolSeizeShare(uint256,uint256)
+          handler: handleNewProtocolSeizeShare
+        - event: NewRedemptionReserveFactor(uint256,uint256)
+          handler: handleNewRedemptionReserveFactor
+        - event: NewReserveFactor(uint256,uint256)
+          handler: handleNewReserveFactor
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: ReservesAdded(address,uint256,uint256)
+          handler: handleReservesAdded
+        - event: ReservesReduced(address,uint256,uint256)
+          handler: handleReservesReduced
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/r-stone.ts
