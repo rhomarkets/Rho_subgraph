@@ -1,178 +1,147 @@
-type AccrueInterest @entity(immutable: true) {
-  id: Bytes!
-  cashPrior: BigInt! # uint256
-  interestAccumulated: BigInt! # uint256
-  borrowIndex: BigInt! # uint256
-  totalBorrows: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+# Comptroller global variables
+type Comptroller @entity {
+  "ID is set to 1"
+  id: ID!
+  "Address of price oracle the comptroller uses"
+  priceOracle: Bytes
+  "Factor used to determine repayAmount for liquidating"
+  closeFactor: BigInt
+  "The percent bonus liquidators get for liquidating"
+  liquidationIncentive: BigInt
 }
 
-type Approval @entity(immutable: true) {
-  id: Bytes!
-  owner: Bytes! # address
-  spender: Bytes! # address
-  amount: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+# Market inforamtion for a CToken
+type Market
+  @entity { # TODO rename to CToken, not market AND ALL OTHERS
+  #Fields that match compounds API
+  "Yearly borrow rate. With 2102400 blocks per year"
+  borrowRate: BigDecimal!
+  "The cToken contract balance of ERC20 or ETH"
+  cash: BigDecimal!
+  "Collateral factor determining how much one can borrow"
+  collateralFactor: BigDecimal!
+  "Exchange rate of tokens / cTokens"
+  exchangeRate: BigDecimal!
+  "Address of the interest rate model"
+  interestRateModelAddress: Bytes!
+  "Name of the cToken"
+  name: String!
+  "Number of borrowers active in the market"
+  numberOfBorrowers: Int!
+  "Number of suppliers active in the market"
+  numberOfSuppliers: Int!
+  "Reserves stored in the contract"
+  reserves: BigDecimal!
+  "Yearly supply rate. With 2104400 blocks per year"
+  supplyRate: BigDecimal!
+  "CToken symbol"
+  symbol: String!
+  "CToken address"
+  id: ID!
+  "Borrows in the market"
+  totalBorrows: BigDecimal!
+  "CToken supply. CTokens have 8 decimals"
+  totalSupply: BigDecimal!
+  "Underlying token address"
+  underlyingAddress: Bytes!
+  "Underlying token name"
+  underlyingName: String!
+  "Underlying price of token in ETH (ex. 0.007 DAI)"
+  underlyingPrice: BigDecimal!
+  "Underlying token symbol"
+  underlyingSymbol: String!
+
+  # Fields that are not in compounds api
+  "Block the market is updated to"
+  accrualBlockNumber: Int!
+  "Timestamp the market was most recently updated"
+  blockTimestamp: Int!
+  "The history of the markets borrow index return (Think S&P 500)"
+  borrowIndex: BigDecimal!
+  "The factor determining interest that goes to reserves"
+  reserveFactor: BigInt!
+  "Underlying token price in USD"
+  underlyingPriceUSD: BigDecimal!
+  "Underlying token decimal length"
+  underlyingDecimals: Int!
 }
 
-type Borrow @entity(immutable: true) {
-  id: Bytes!
-  borrower: Bytes! # address
-  borrowAmount: BigInt! # uint256
-  accountBorrows: BigInt! # uint256
-  totalBorrows: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+# Users within the protocol
+type Account @entity {
+  "User ETH address"
+  id: ID!
+  "Array of CTokens user is in"
+  tokens: [AccountCToken!]! @derivedFrom(field: "account")
+  "Count user has been liquidated"
+  countLiquidated: Int!
+  "Count user has liquidated others"
+  countLiquidator: Int!
+  "True if user has ever borrowed"
+  hasBorrowed: Boolean!
+
+  # The following values are added by the JS Wrapper, and must be calculated with the most up
+  # to date values based on the block delta for market.exchangeRate and market.borrowIndex
+  # They do not need to be in the schema, but they will show up in the explorer playground
+
+  # "If less than 1, the account can be liquidated
+  # health: BigDecimal!
+  # "Total assets supplied by user"
+  # totalBorrowValueInEth: BigDecimal!
+  # "Total assets borrowed from user"
+  # totalCollateralValueInEth: BigDecimal!
 }
 
-type Failure @entity(immutable: true) {
-  id: Bytes!
-  error: BigInt! # uint256
-  info: BigInt! # uint256
-  detail: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
+# Stats for an accounts borrow and supply of an asset
+type AccountCToken @entity {
+  "Concatenation of CToken address and user address"
+  id: ID!
+  "Relation to market"
+  market: Market!
+  "Symbol of the cToken"
+  symbol: String!
+  "Relation to user"
+  account: Account!
+  "Hashes of all user transactions"
+  transactionHashes: [Bytes!]!
+  "Times of all user transactions"
+  transactionTimes: [Int!]!
+  "Block number this asset was updated at in the contract"
+  accrualBlockNumber: Int!
+  "True if user is entered, false if they are exited"
+  enteredMarket: Boolean!
 
-type LiquidateBorrow @entity(immutable: true) {
-  id: Bytes!
-  liquidator: Bytes! # address
-  borrower: Bytes! # address
-  repayAmount: BigInt! # uint256
-  rTokenCollateral: Bytes! # address
-  seizeTokens: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
+  "CToken balance of the user"
+  cTokenBalance: BigDecimal!
+  "Total amount of underlying supplied"
+  totalUnderlyingSupplied: BigDecimal!
+  "Total amount of underlying supplied USD"
+  totalUnderlyingSuppliedUSD: BigDecimal!
+  "Total amount of underling redeemed"
+  totalUnderlyingRedeemed: BigDecimal!
+  "The value of the borrow index upon users last interaction"
+  accountBorrowIndex: BigDecimal!
+  "Total amount underlying borrowed, exclusive of interest"
+  totalUnderlyingBorrowed: BigDecimal!
+  "Total amount underlying borrowed USD, exclusive of interest"
+  totalUnderlyingBorrowedUSD: BigDecimal!
+  "Total amount underlying repaid"
+  totalUnderlyingRepaid: BigDecimal!
+  "Current borrow balance stored in contract (exclusive of interest since accrualBlockNumber)"
+  storedBorrowBalance: BigDecimal!
 
-type Mint @entity(immutable: true) {
-  id: Bytes!
-  minter: Bytes! # address
-  mintAmount: BigInt! # uint256
-  mintTokens: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
+  # The following values are added by the JS Wrapper, and must be calculated with the most up
+  # to date values based on the block delta for market.exchangeRate and market.borrowIndex
+  # They do not need to be in the schema, but they will show up in the explorer playground
 
-type NewAdmin @entity(immutable: true) {
-  id: Bytes!
-  oldAdmin: Bytes! # address
-  newAdmin: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
+  # supplyBalanceUnderlying: BigDecimal!
+  # FORMULA: supplyBalanceUnderlying = cTokenBalance * market.exchangeRate
 
-type NewComptroller @entity(immutable: true) {
-  id: Bytes!
-  oldComptroller: Bytes! # address
-  newComptroller: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
+  # lifetimeSupplyInterestAccrued: BigDecimal!
+  # FORMULA: lifetimeSupplyInterestAccrued = supplyBalanceUnderlying - totalUnderlyingSupplied + totalUnderlyingRedeemed
 
-type NewMarketInterestRateModel @entity(immutable: true) {
-  id: Bytes!
-  oldInterestRateModel: Bytes! # address
-  newInterestRateModel: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
+  # borrowBalanceUnderlying: BigDecimal!
+  # FORMULA: borrowBalanceUnderlying = storedBorrowBalance * market.borrowIndex / accountBorrowIndex
 
-type NewPendingAdmin @entity(immutable: true) {
-  id: Bytes!
-  oldPendingAdmin: Bytes! # address
-  newPendingAdmin: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type NewProtocolSeizeShare @entity(immutable: true) {
-  id: Bytes!
-  oldProtocolSeizeShareMantissa: BigInt! # uint256
-  newProtocolSeizeShareMantissa: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type NewRedemptionReserveFactor @entity(immutable: true) {
-  id: Bytes!
-  oldRedemptionReserveFactor: BigInt! # uint256
-  newRedemptionReserveFactor: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type NewReserveFactor @entity(immutable: true) {
-  id: Bytes!
-  oldReserveFactorMantissa: BigInt! # uint256
-  newReserveFactorMantissa: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type Redeem @entity(immutable: true) {
-  id: Bytes!
-  redeemer: Bytes! # address
-  redeemAmount: BigInt! # uint256
-  redeemTokens: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type RepayBorrow @entity(immutable: true) {
-  id: Bytes!
-  payer: Bytes! # address
-  borrower: Bytes! # address
-  repayAmount: BigInt! # uint256
-  accountBorrows: BigInt! # uint256
-  totalBorrows: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type ReservesAdded @entity(immutable: true) {
-  id: Bytes!
-  benefactor: Bytes! # address
-  addAmount: BigInt! # uint256
-  newTotalReserves: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type ReservesReduced @entity(immutable: true) {
-  id: Bytes!
-  admin: Bytes! # address
-  reduceAmount: BigInt! # uint256
-  newTotalReserves: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type Transfer @entity(immutable: true) {
-  id: Bytes!
-  from: Bytes! # address
-  to: Bytes! # address
-  amount: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  # lifetimeBorrowInterestAccrued: BigDecimal!
+  # FORMULA: lifetimeBorrowInterestAccrued = borrowBalanceUnderlying - totalUnderlyingBorrowed + totalUnderlyingRepaid
 }

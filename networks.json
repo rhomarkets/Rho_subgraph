@@ -3,6 +3,9 @@
     "rSTONE": {
       "address": "0x9f326731257a9B4a138B41590E70A10e00b5e6d8",
       "startBlock": 4349177
+    },
+    "": {
+      "address": "0x86d15bF19A5FEd1C8bC700fa82Bae59e4E705a62"
     }
   }
 }

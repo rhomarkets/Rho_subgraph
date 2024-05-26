@@ -1,0 +1,335 @@
+[
+    { "type": "constructor", "inputs": [], "stateMutability": "nonpayable" },
+    {
+      "type": "function",
+      "name": "assetInfos",
+      "inputs": [{ "name": "", "type": "string", "internalType": "string" }],
+      "outputs": [
+        { "name": "price", "type": "uint256", "internalType": "uint256" },
+        { "name": "symbol", "type": "string", "internalType": "string" },
+        {
+          "name": "nativeChainlinkFeed",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "rTokenChainlinkFeed",
+          "type": "address",
+          "internalType": "address"
+        },
+        { "name": "decimals", "type": "uint8", "internalType": "uint8" }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "assetPrices",
+      "inputs": [
+        {
+          "name": "_underlyingAsset",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "comptroller",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract Comptroller"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "fallbackOracle",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IRedstonePriceFeed"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getFeed",
+      "inputs": [
+        { "name": "symbol", "type": "string", "internalType": "string" }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "tuple",
+          "internalType": "struct PriceFeed.AssetPriceInfo",
+          "components": [
+            { "name": "price", "type": "uint256", "internalType": "uint256" },
+            { "name": "symbol", "type": "string", "internalType": "string" },
+            {
+              "name": "nativeChainlinkFeed",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "rTokenChainlinkFeed",
+              "type": "address",
+              "internalType": "address"
+            },
+            { "name": "decimals", "type": "uint8", "internalType": "uint8" }
+          ]
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getPrice",
+      "inputs": [
+        {
+          "name": "rToken",
+          "type": "address",
+          "internalType": "contract RToken"
+        }
+      ],
+      "outputs": [
+        { "name": "price", "type": "uint256", "internalType": "uint256" }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getUnderlyingPrice",
+      "inputs": [
+        {
+          "name": "rToken",
+          "type": "address",
+          "internalType": "contract RToken"
+        }
+      ],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "initialize",
+      "inputs": [
+        { "name": "_comptroller", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "setFallbackOracle",
+      "inputs": [
+        {
+          "name": "oracle",
+          "type": "address",
+          "internalType": "contract IRedstonePriceFeed"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "setPrice",
+      "inputs": [
+        { "name": "_symbol", "type": "string", "internalType": "string" },
+        { "name": "_decimals", "type": "uint8", "internalType": "uint8" },
+        { "name": "_prices", "type": "uint256", "internalType": "uint256" },
+        {
+          "name": "_nativeChainlinkFeed",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "_rTokenChainlinkFeed",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "setSequencerUptimeFeed",
+      "inputs": [
+        {
+          "name": "_sequencerUptimeFeed",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "setUnderlyingPrice",
+      "inputs": [
+        {
+          "name": "rToken",
+          "type": "address",
+          "internalType": "contract RToken"
+        },
+        { "name": "price", "type": "uint256", "internalType": "uint256" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "underlyingAssets",
+      "inputs": [{ "name": "", "type": "address", "internalType": "address" }],
+      "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "event",
+      "name": "FeedSet",
+      "inputs": [
+        {
+          "name": "feed",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "symbol",
+          "type": "string",
+          "indexed": false,
+          "internalType": "string"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "Initialized",
+      "inputs": [
+        {
+          "name": "version",
+          "type": "uint64",
+          "indexed": false,
+          "internalType": "uint64"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "NewAdmin",
+      "inputs": [
+        {
+          "name": "oldAdmin",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "newAdmin",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "NewAssetPriceInfo",
+      "inputs": [
+        {
+          "name": "symbol",
+          "type": "string",
+          "indexed": true,
+          "internalType": "string"
+        },
+        {
+          "name": "price",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "decimals",
+          "type": "uint8",
+          "indexed": false,
+          "internalType": "uint8"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "NewFallbackOracle",
+      "inputs": [
+        {
+          "name": "oracle",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "PricePosted",
+      "inputs": [
+        {
+          "name": "asset",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "previousPriceMantissa",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "newPriceMantissa",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "PriceUpdated",
+      "inputs": [
+        {
+          "name": "oracle",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "price",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    { "type": "error", "name": "GracePeriodNotOver", "inputs": [] },
+    { "type": "error", "name": "InvalidInitialization", "inputs": [] },
+    { "type": "error", "name": "NotInitializing", "inputs": [] },
+    { "type": "error", "name": "SequencerDown", "inputs": [] }
+  ]

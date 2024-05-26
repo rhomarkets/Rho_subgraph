@@ -8,6 +8,15 @@
   },
   {
     "type": "function",
+    "name": "_addReserves",
+    "inputs": [
+      { "name": "addAmount", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "_reduceReserves",
     "inputs": [
       { "name": "reduceAmount", "type": "uint256", "internalType": "uint256" }
@@ -69,6 +78,19 @@
   },
   {
     "type": "function",
+    "name": "_setRedemptionReserveFactorFresh",
+    "inputs": [
+      {
+        "name": "newRedemptionReserveFactorMantissa",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "_setReserveFactor",
     "inputs": [
       {
@@ -82,7 +104,7 @@
   },
   {
     "type": "function",
-    "name": "accrualBlockTimestamp",
+    "name": "accrualBlockNumber",
     "inputs": [],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "view"
@@ -143,6 +165,15 @@
   },
   {
     "type": "function",
+    "name": "borrow",
+    "inputs": [
+      { "name": "borrowAmount", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "borrowBalanceCurrent",
     "inputs": [
       { "name": "account", "type": "address", "internalType": "address" }
@@ -168,7 +199,7 @@
   },
   {
     "type": "function",
-    "name": "borrowRatePerTimestamp",
+    "name": "borrowRatePerBlock",
     "inputs": [],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "view"
@@ -232,6 +263,33 @@
     "type": "function",
     "name": "initialize",
     "inputs": [
+      { "name": "underlying_", "type": "address", "internalType": "address" },
+      {
+        "name": "comptroller_",
+        "type": "address",
+        "internalType": "contract ComptrollerInterface"
+      },
+      {
+        "name": "interestRateModel_",
+        "type": "address",
+        "internalType": "contract InterestRateModel"
+      },
+      {
+        "name": "initialExchangeRateMantissa_",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      { "name": "name_", "type": "string", "internalType": "string" },
+      { "name": "symbol_", "type": "string", "internalType": "string" },
+      { "name": "decimals_", "type": "uint8", "internalType": "uint8" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "initialize",
+    "inputs": [
       {
         "name": "comptroller_",
         "type": "address",
@@ -269,10 +327,54 @@
   },
   {
     "type": "function",
+    "name": "isEthDerivative",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "isRToken",
     "inputs": [],
     "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "liquidateBorrow",
+    "inputs": [
+      { "name": "borrower", "type": "address", "internalType": "address" },
+      { "name": "repayAmount", "type": "uint256", "internalType": "uint256" },
+      {
+        "name": "rTokenCollateral",
+        "type": "address",
+        "internalType": "contract RTokenInterface"
+      }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "mint",
+    "inputs": [
+      { "name": "mintAmount", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "mintWithPermit",
+    "inputs": [
+      { "name": "mintAmount", "type": "uint256", "internalType": "uint256" },
+      { "name": "deadline", "type": "uint256", "internalType": "uint256" },
+      { "name": "v", "type": "uint8", "internalType": "uint8" },
+      { "name": "r", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "s", "type": "bytes32", "internalType": "bytes32" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -299,6 +401,43 @@
   },
   {
     "type": "function",
+    "name": "redeem",
+    "inputs": [
+      { "name": "redeemTokens", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "redeemUnderlying",
+    "inputs": [
+      { "name": "redeemAmount", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "repayBorrow",
+    "inputs": [
+      { "name": "repayAmount", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "repayBorrowBehalf",
+    "inputs": [
+      { "name": "borrower", "type": "address", "internalType": "address" },
+      { "name": "repayAmount", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "reserveFactorMantissa",
     "inputs": [],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
@@ -317,10 +456,23 @@
   },
   {
     "type": "function",
-    "name": "supplyRatePerTimestamp",
+    "name": "supplyRatePerBlock",
     "inputs": [],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "sweepToken",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address",
+        "internalType": "contract EIP20NonStandardInterface"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -377,6 +529,13 @@
     ],
     "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "underlying",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
   },
   {
     "type": "event",
