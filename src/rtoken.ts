@@ -20,8 +20,9 @@ import {
 } from "./helpers";
 import { createMarket, updateMarket } from "./markets";
 import { PriceFeed } from "../generated/Comptroller/PriceFeed";
+import { Comptroller } from "../generated/Comptroller/Comptroller";
 
-const priceOracle = "0x4AeAe096614E5Bc1e124d6326F18A06C8FFd1665";
+const priceOracle = "0x04c8D4520aB5C067cEc9Ada61A26A8b46c12aaEA";
 
 /* Borrow assets from the protocol. All values either ETH or ERC20
  *
@@ -34,6 +35,7 @@ const priceOracle = "0x4AeAe096614E5Bc1e124d6326F18A06C8FFd1665";
  */
 export function handleBorrow(event: Borrow): void {
   let market = Market.load(event.address.toHex());
+
   let accountID = event.params.borrower.toHex();
 
   let account = Account.load(accountID);
@@ -60,8 +62,6 @@ export function handleBorrow(event: Borrow): void {
     usdPrice = currentPrice.value.toBigDecimal();
   }
 
-  usdPrice = usdPrice.div(mantissaFactorBD);
-
   // Update cTokenStats common for all events, and return the stats to update unique
   // values for each event
   let cTokenStats = updateCommonCTokenStats(
@@ -74,6 +74,10 @@ export function handleBorrow(event: Borrow): void {
   );
 
   let underlyingDecimals = exponentToBigDecimal(market.underlyingDecimals);
+
+  usdPrice = usdPrice.div(mantissaFactorBD);
+
+  log.info(`*** DISPLAY *** : usdPrice: ${usdPrice}`, [account.id]);
 
   let borrowAmountBD = underlyingDecimals.equals(zeroBD)
     ? zeroBD
@@ -96,6 +100,27 @@ export function handleBorrow(event: Borrow): void {
 
   cTokenStats.save();
 
+  if (account) {
+    const borrowAmountDelta = usdPrice.times(borrowAmountBD);
+
+    // TODO - exchange rate
+    account.totalBorrowValueInEth =
+      account.totalBorrowValueInEth.plus(borrowAmountDelta);
+
+    log.info(
+      `*** BORROW CALCULATION *** : totalBorrowValueInEth: borrowAmountDelta ${borrowAmountDelta}, usdPrice ${usdPrice},  borrowAmountBD ${borrowAmountBD}, cTokenDecimalsBD ${cTokenDecimalsBD}, exchangeRate ${market.exchangeRate}`,
+      [account.id]
+    );
+    account.save();
+  }
+  let comptroller = Comptroller.bind(
+    Address.fromString("0x0777EACb29199ba125677968c43Ed754De64cC91")
+  );
+  let accountLpInfo = comptroller.getAccountLiquidity(
+    Address.fromString(account.id)
+  );
+  account.liquitity = accountLpInfo.value1.toBigDecimal();
+  account.shortfall = accountLpInfo.value2.toBigDecimal();
   account.hasBorrowed = true;
   account.save();
 
@@ -124,15 +149,30 @@ export function handleBorrow(event: Borrow): void {
  */
 export function handleRepayBorrow(event: RepayBorrow): void {
   let market = Market.load(event.address.toHexString());
-  let accountID = event.params.borrower.toHex();
-
-  let account = Account.load(accountID);
-  if (account == null) {
-    createAccount(accountID);
-  }
 
   if (!market) {
     return;
+  }
+
+  let accountID = event.params.borrower.toHex();
+  let oracleAddress = Address.fromString(priceOracle);
+  let oracle = PriceFeed.bind(oracleAddress);
+  let currentPrice = oracle.try_getPrice(event.address);
+
+  let usdPrice: BigDecimal;
+
+  if (currentPrice.reverted) {
+    log.info("*** CALL FAILED *** : ERC20: getPrice() reverted.", [
+      oracleAddress.toHex(),
+    ]);
+    usdPrice = zeroBD;
+  } else {
+    usdPrice = currentPrice.value.toBigDecimal();
+  }
+
+  let account = Account.load(accountID);
+  if (account == null) {
+    account = createAccount(accountID);
   }
 
   // Update cTokenStats common for all events, and return the stats to update unique
@@ -146,6 +186,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     event.block.number.toI32()
   );
   let underlyingDecimals = exponentToBigDecimal(market.underlyingDecimals);
+  usdPrice = usdPrice.div(mantissaFactorBD);
 
   let repayAmountBD = underlyingDecimals.equals(zeroBD)
     ? zeroBD
@@ -162,6 +203,35 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   cTokenStats.totalUnderlyingRepaid =
     cTokenStats.totalUnderlyingRepaid.plus(repayAmountBD);
   cTokenStats.save();
+
+  if (account) {
+    // TODO - exchange rate
+
+    const repayAmountDelta = repayAmountBD
+      .times(usdPrice)
+      .times(market.exchangeRate);
+
+    account.totalBorrowValueInEth =
+      account.totalCollateralValueInEth.minus(repayAmountDelta);
+
+    log.info(
+      `*** REPAY CALCULATION *** : totalBorrowValueInEth: repayAmountDelta ${repayAmountDelta} repayAmountBD ${repayAmountBD}, usdPrice ${usdPrice}, cTokenDecimalsBD ${cTokenDecimalsBD}, exchangeRate ${market.exchangeRate}`,
+      [account.id]
+    );
+  }
+
+  let comptroller = Comptroller.bind(
+    Address.fromString("0x0777EACb29199ba125677968c43Ed754De64cC91")
+  );
+  let accountLpInfo = comptroller.getAccountLiquidity(
+    Address.fromString(account.id)
+  );
+  account.liquitity = accountLpInfo.value1.toBigDecimal();
+  account.shortfall = accountLpInfo.value2.toBigDecimal();
+  account.hasBorrowed = true;
+  account.save();
+
+  account.save();
 
   if (cTokenStats.storedBorrowBalance.equals(zeroBD)) {
     market.numberOfBorrowers = market.numberOfBorrowers - 1;
@@ -200,6 +270,8 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
     borrower = createAccount(borrowerID);
   }
   borrower.countLiquidated = borrower.countLiquidated + 1;
+
+  
   borrower.save();
 }
 
@@ -223,6 +295,7 @@ export function handleTransfer(event: Transfer): void {
   // with normal transfers, since mint, redeem, and seize transfers will already run updateMarket()
   let marketID = event.address.toHexString();
   let market = Market.load(marketID);
+  let account = Account.load(event.params.to.toHex());
   if (!market) {
     return;
   }
@@ -241,7 +314,6 @@ export function handleTransfer(event: Transfer): void {
   } else {
     usdPrice = currentPrice.value.toBigDecimal();
   }
-  usdPrice = usdPrice.div(mantissaFactorBD);
 
   if (market.accrualBlockNumber != event.block.number.toI32()) {
     market = updateMarket(
@@ -252,6 +324,7 @@ export function handleTransfer(event: Transfer): void {
   }
 
   let underlyingDecimals = exponentToBigDecimal(market.underlyingDecimals);
+  usdPrice = usdPrice.div(mantissaFactorBD);
 
   let amountUnderlying = market.exchangeRate.times(
     cTokenDecimalsBD.equals(zeroBD)
@@ -347,6 +420,32 @@ export function handleTransfer(event: Transfer): void {
     ) {
       market.numberOfSuppliers = market.numberOfSuppliers + 1;
       market.save();
+    }
+    
+
+    if (account) {
+      const cTokenBalanceDelta = event.params.amount
+        .toBigDecimal()
+        .times(usdPrice)
+        .times(market.exchangeRate)
+        .div(underlyingDecimals);
+
+      account.totalCollateralValueInEth =
+        account.totalCollateralValueInEth.plus(cTokenBalanceDelta);
+
+      log.info(
+        `*** SUPPLY CALCULATION *** : AmountIn ${event.params.amount} totalCollateralValueInEth: cTokenBalanceDelta ${cTokenBalanceDelta} cTokenBalance ${cTokenStatsTo.cTokenBalance}, usdPrice ${usdPrice}, cTokenDecimalsBD ${cTokenDecimalsBD}, exchangeRate ${market.exchangeRate}`,
+        [account.id]
+      );
+      let comptroller = Comptroller.bind(
+        Address.fromString("0x0777EACb29199ba125677968c43Ed754De64cC91")
+      );
+      
+      let accountLpInfo = comptroller.getAccountLiquidity(Address.fromString(account.id));
+      account.liquitity = accountLpInfo.value1.toBigDecimal();
+      account.shortfall = accountLpInfo.value2.toBigDecimal();
+      account.hasBorrowed = true;    
+      account.save();
     }
   }
 }

@@ -58,6 +58,8 @@ type Market
   blockTimestamp: Int!
   "The history of the markets borrow index return (Think S&P 500)"
   borrowIndex: BigDecimal!
+  "Liquidation Threshold value in USD"
+  liquidationThresholdUSD: BigDecimal!
   "The factor determining interest that goes to reserves"
   reserveFactor: BigInt!
   "Underlying token price in USD"
@@ -78,17 +80,19 @@ type Account @entity {
   countLiquidator: Int!
   "True if user has ever borrowed"
   hasBorrowed: Boolean!
+  "Account liquitity"
+  liquitity: BigDecimal!
+  "Account shortfall"
+  shortfall: BigDecimal!
 
   # The following values are added by the JS Wrapper, and must be calculated with the most up
   # to date values based on the block delta for market.exchangeRate and market.borrowIndex
   # They do not need to be in the schema, but they will show up in the explorer playground
 
-  # "If less than 1, the account can be liquidated
-  # health: BigDecimal!
-  # "Total assets supplied by user"
-  # totalBorrowValueInEth: BigDecimal!
-  # "Total assets borrowed from user"
-  # totalCollateralValueInEth: BigDecimal!
+  "Total assets supplied by user"
+  totalBorrowValueInEth: BigDecimal!
+  "Total assets borrowed from user"
+  totalCollateralValueInEth: BigDecimal!
 }
 
 # Stats for an accounts borrow and supply of an asset

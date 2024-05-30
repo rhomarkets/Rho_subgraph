@@ -187,6 +187,7 @@ export function createMarket(marketAddress: string): Market {
   market.name = contract.name();
   market.numberOfBorrowers = 0;
   market.numberOfSuppliers = 0;
+  market.liquidationThresholdUSD = zeroBD;
   market.reserves = zeroBD;
   market.supplyRate = zeroBD;
   market.symbol = contract.symbol();
@@ -252,6 +253,9 @@ export function updateMarket(
     market.totalSupply = cTokenDecimalsBD.equals(zeroBD)
       ? zeroBD
       : contract.totalSupply().toBigDecimal().div(cTokenDecimalsBD);
+    market.liquidationThresholdUSD = market.totalSupply
+      .times(market.underlyingPrice)
+      .times(market.collateralFactor);
 
     /* Exchange rate explanation
        In Practice
@@ -271,8 +275,7 @@ export function updateMarket(
       market.exchangeRate = contract
         .exchangeRateStored()
         .toBigDecimal()
-        .div(exponentToBigDecimal(mantissaFactor))
-        .truncate(mantissaFactor);
+        .div(exponentToBigDecimal(mantissaFactor));
     }
 
     if (mantissaFactorBD.equals(zeroBD)) {

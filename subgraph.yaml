@@ -8,7 +8,7 @@ dataSources:
     name: rSTONE
     network: scroll-sepolia
     source:
-      address: "0xEEbDf71FCb671368B2C54Db7ea1a926d302FAC25"
+      address: "0x10167973CDde2730fe283D95E74dd75DBB5CcaBC"
       abi: RToken
       startBlock: 4200000
     mapping:
@@ -22,6 +22,8 @@ dataSources:
       abis:
         - name: RToken
           file: ./abis/rtoken.json
+        - name: Comptroller
+          file: ./abis/comptroller.json
         - name: PriceFeed
           file: ./abis/PriceFeed.json
         - name: ERC20
@@ -48,7 +50,7 @@ dataSources:
     name: rUSDC
     network: scroll-sepolia
     source:
-      address: "0xCfFF30BC471C31D2660066797BCFCFe7CF3690B0"
+      address: "0xa3807e5A390C605c8b962C96aA3A78c5B0524F60"
       abi: RToken
       startBlock: 4200000
     mapping:
@@ -62,6 +64,8 @@ dataSources:
       abis:
         - name: RToken
           file: ./abis/rtoken.json
+        - name: Comptroller
+          file: ./abis/comptroller.json
         - name: PriceFeed
           file: ./abis/PriceFeed.json
         - name: ERC20
@@ -88,7 +92,7 @@ dataSources:
     name: rUSDT
     network: scroll-sepolia
     source:
-      address: "0x472B6B2AED5426130147C456Dc3FdB6a6a7F5AC2"
+      address: "0x80dbC380dF374e82f7A818f96B346517FD6fE6D1"
       abi: RToken
       startBlock: 4200000
     mapping:
@@ -102,6 +106,8 @@ dataSources:
       abis:
         - name: RToken
           file: ./abis/rtoken.json
+        - name: Comptroller
+          file: ./abis/comptroller.json
         - name: PriceFeed
           file: ./abis/PriceFeed.json
         - name: ERC20
@@ -128,7 +134,7 @@ dataSources:
     name: rWBTC
     network: scroll-sepolia
     source:
-      address: "0xa62AF4d7041997eDd093d9b3b327f32BB3074582"
+      address: "0x508F7F654De673f24838e42b161dE4c54044E54d"
       abi: RToken
       startBlock: 4368368
     mapping:
@@ -142,6 +148,8 @@ dataSources:
       abis:
         - name: RToken
           file: ./abis/rtoken.json
+        - name: Comptroller
+          file: ./abis/comptroller.json
         - name: PriceFeed
           file: ./abis/PriceFeed.json
         - name: ERC20
@@ -168,7 +176,7 @@ dataSources:
     name: rWETH
     network: scroll-sepolia
     source:
-      address: "0xc4227cf03dC3C7d333D8c9687a5B063Ea8F2AbAD"
+      address: "0xdC4E583a25735AF1Cb5904293a76324Aa1dDDc81"
       abi: RToken
       startBlock: 4200000
     mapping:
@@ -182,6 +190,8 @@ dataSources:
       abis:
         - name: RToken
           file: ./abis/rtoken.json
+        - name: Comptroller
+          file: ./abis/comptroller.json
         - name: PriceFeed
           file: ./abis/PriceFeed.json
         - name: ERC20
@@ -208,7 +218,7 @@ dataSources:
     name: rETH
     network: scroll-sepolia
     source:
-      address: "0x50581759977c2caaa5Fde5B62F8C2285a245C336"
+      address: "0x7C40e4A46Bf2b33f39a0fC6FD382969dd83dEc52"
       abi: RToken
       startBlock: 4200000
     mapping:
@@ -222,6 +232,8 @@ dataSources:
       abis:
         - name: RToken
           file: ./abis/rtoken.json
+        - name: Comptroller
+          file: ./abis/comptroller.json
         - name: PriceFeed
           file: ./abis/PriceFeed.json
         - name: ERC20
@@ -248,7 +260,7 @@ dataSources:
     name: Comptroller
     network: scroll-sepolia
     source:
-      address: "0x0777EACb29199ba125677968c43Ed754De64cC91"
+      address: "0xb08054f31d923B7D1a8aDDF8Bac7f88b1484cD27"
       abi: Comptroller
       startBlock: 4200000
     mapping:

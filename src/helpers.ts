@@ -47,6 +47,10 @@ export function createAccount(accountID: string): Account {
   account.countLiquidated = 0;
   account.countLiquidator = 0;
   account.hasBorrowed = false;
+  account.totalBorrowValueInEth = zeroBD;
+  account.totalCollateralValueInEth = zeroBD;
+  account.liquitity = zeroBD;
+  account.shortfall = zeroBD;
   account.save();
   return account;
 }

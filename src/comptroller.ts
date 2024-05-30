@@ -89,6 +89,8 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
   if (comptroller == null) {
     comptroller = new Comptroller("1");
   }
+
+
   comptroller.priceOracle = event.params.newPriceOracle;
   comptroller.save();
 }
