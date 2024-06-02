@@ -8,7 +8,8 @@ import {
   RepayBorrow,
   Transfer,
 } from "../generated/rSTONE/RToken";
-import { Account, Market } from "../generated/schema";
+
+import { Account, Market,LiquidationBorrow  } from "../generated/schema";
 import {
   cTokenDecimals,
   cTokenDecimalsBD,
@@ -17,12 +18,13 @@ import {
   mantissaFactorBD,
   updateCommonCTokenStats,
   zeroBD,
+  priceOracle,
+  comptrollerAddress
 } from "./helpers";
 import { createMarket, updateMarket } from "./markets";
 import { PriceFeed } from "../generated/Comptroller/PriceFeed";
 import { Comptroller } from "../generated/Comptroller/Comptroller";
 
-const priceOracle = "0x04c8D4520aB5C067cEc9Ada61A26A8b46c12aaEA";
 
 /* Borrow assets from the protocol. All values either ETH or ERC20
  *
@@ -42,6 +44,10 @@ export function handleBorrow(event: Borrow): void {
   if (account == null) {
     account = createAccount(accountID);
   }
+
+  log.info("*** ACCOUNT *** : totalBorrowValueInEth init3: {}", [
+    account.totalBorrowValueInEth.toString(),
+  ]);
 
   if (!market) {
     return;
@@ -72,7 +78,9 @@ export function handleBorrow(event: Borrow): void {
     event.block.timestamp.toI32(),
     event.block.number.toI32()
   );
-
+  log.info("*** ACCOUNT *** : totalBorrowValueInEth init4: {}", [
+    account.totalBorrowValueInEth.toString(),
+  ]);
   let underlyingDecimals = exponentToBigDecimal(market.underlyingDecimals);
 
   usdPrice = usdPrice.div(mantissaFactorBD);
@@ -82,6 +90,9 @@ export function handleBorrow(event: Borrow): void {
   let borrowAmountBD = underlyingDecimals.equals(zeroBD)
     ? zeroBD
     : event.params.borrowAmount.toBigDecimal().div(underlyingDecimals);
+
+    log.info(`*** DISPLAY *** : borrowAmountBD {}:`, [borrowAmountBD.toString()]);
+
   let previousBorrow = cTokenStats.storedBorrowBalance;
 
   cTokenStats.storedBorrowBalance = underlyingDecimals.equals(zeroBD)
@@ -102,10 +113,11 @@ export function handleBorrow(event: Borrow): void {
 
   if (account) {
     const borrowAmountDelta = usdPrice.times(borrowAmountBD);
-
+    log.info("Total Borrow Value In handleBorrow after repayment: {}", [account.totalBorrowValueInEth.toString()]);
     // TODO - exchange rate
     account.totalBorrowValueInEth =
       account.totalBorrowValueInEth.plus(borrowAmountDelta);
+      log.info("Total Borrow Value In handleBorrow after repayment: {}", [account.totalBorrowValueInEth.toString()]);
 
     log.info(
       `*** BORROW CALCULATION *** : totalBorrowValueInEth: borrowAmountDelta ${borrowAmountDelta}, usdPrice ${usdPrice},  borrowAmountBD ${borrowAmountBD}, cTokenDecimalsBD ${cTokenDecimalsBD}, exchangeRate ${market.exchangeRate}`,
@@ -114,7 +126,7 @@ export function handleBorrow(event: Borrow): void {
     account.save();
   }
   let comptroller = Comptroller.bind(
-    Address.fromString("0x0777EACb29199ba125677968c43Ed754De64cC91")
+    Address.fromString(comptrollerAddress)
   );
   let accountLpInfo = comptroller.getAccountLiquidity(
     Address.fromString(account.id)
@@ -174,7 +186,9 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   if (account == null) {
     account = createAccount(accountID);
   }
-
+  log.info("*** ACCOUNT *** : totalBorrowValueInEth init1: {}", [
+    account.totalBorrowValueInEth.toString(),
+  ]);
   // Update cTokenStats common for all events, and return the stats to update unique
   // values for each event
   let cTokenStats = updateCommonCTokenStats(
@@ -204,7 +218,12 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     cTokenStats.totalUnderlyingRepaid.plus(repayAmountBD);
   cTokenStats.save();
 
-  if (account) {
+
+  log.info("*** ACCOUNT *** : totalBorrowValueInEth init2: {}", [
+    account.totalBorrowValueInEth.toString(),
+  ]);
+
+  if (account && event.params.borrower) {
     // TODO - exchange rate
 
     const repayAmountDelta = repayAmountBD
@@ -212,16 +231,12 @@ export function handleRepayBorrow(event: RepayBorrow): void {
       .times(market.exchangeRate);
 
     account.totalBorrowValueInEth =
-      account.totalCollateralValueInEth.minus(repayAmountDelta);
+      account.totalBorrowValueInEth.minus(repayAmountDelta);
 
-    log.info(
-      `*** REPAY CALCULATION *** : totalBorrowValueInEth: repayAmountDelta ${repayAmountDelta} repayAmountBD ${repayAmountBD}, usdPrice ${usdPrice}, cTokenDecimalsBD ${cTokenDecimalsBD}, exchangeRate ${market.exchangeRate}`,
-      [account.id]
-    );
   }
 
   let comptroller = Comptroller.bind(
-    Address.fromString("0x0777EACb29199ba125677968c43Ed754De64cC91")
+    Address.fromString(comptrollerAddress)
   );
   let accountLpInfo = comptroller.getAccountLiquidity(
     Address.fromString(account.id)
@@ -229,8 +244,6 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   account.liquitity = accountLpInfo.value1.toBigDecimal();
   account.shortfall = accountLpInfo.value2.toBigDecimal();
   account.hasBorrowed = true;
-  account.save();
-
   account.save();
 
   if (cTokenStats.storedBorrowBalance.equals(zeroBD)) {
@@ -256,14 +269,15 @@ export function handleRepayBorrow(event: RepayBorrow): void {
  *    add liquidation counts in this handler.
  */
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
+  // 加载或创建清算人账户
   let liquidatorID = event.params.liquidator.toHex();
   let liquidator = Account.load(liquidatorID);
   if (liquidator == null) {
     liquidator = createAccount(liquidatorID);
   }
   liquidator.countLiquidator = liquidator.countLiquidator + 1;
-  liquidator.save();
 
+    // 加载或创建被清算人账户
   let borrowerID = event.params.borrower.toHex();
   let borrower = Account.load(borrowerID);
   if (borrower == null) {
@@ -271,8 +285,70 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   }
   borrower.countLiquidated = borrower.countLiquidated + 1;
 
-  
+  // 创建并保存 LiquidationEvent 实体
+  let liquidationEvent = new LiquidationBorrow(
+    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
+  );
+  liquidationEvent.liquidator = liquidatorID;
+  liquidationEvent.borrower = event.params.borrower;
+  liquidationEvent.repayAmount = event.params.repayAmount;
+  liquidationEvent.seizeTokens = event.params.seizeTokens;
+  liquidationEvent.rTokenCollateral = event.params.rTokenCollateral;
+  liquidationEvent.blockNumber = event.block.number;
+  liquidationEvent.blockTimestamp = event.block.timestamp;
+  liquidationEvent.transactionHash = event.transaction.hash;
+  liquidationEvent.save();
+
+    // 加载或创建市场
+  let marketID = event.params.rTokenCollateral.toHex();
+  let market = Market.load(marketID);
+  if (!market) {
+    market = createMarket(marketID);
+  }
+
+    // 获取价格
+  let oracleAddress = Address.fromString(priceOracle);
+  let oracle = PriceFeed.bind(oracleAddress);
+  let usdPrice: BigDecimal;
+
+  let currentPrice = oracle.try_getPrice(event.params.rTokenCollateral);
+  if (currentPrice.reverted) {
+    log.info("*** CALL FAILED *** : ERC20: getPrice() reverted.", [
+      oracleAddress.toHex(),
+    ]);
+    usdPrice = zeroBD;
+  } else {
+    usdPrice = currentPrice.value.toBigDecimal();
+  }
+  // 获取cToken的精度
+  let underlyingDecimals = exponentToBigDecimal(market.underlyingDecimals);
+    // 调整usdPrice的精度
+  usdPrice = usdPrice.div(mantissaFactorBD);
+
+  let repayAmountUSD = event.params.repayAmount.toBigDecimal().div(underlyingDecimals).times(usdPrice);
+  log.info("Repay Amount: {}", [event.params.repayAmount.toString()]);
+  log.info("Repay Amount USD: {}", [repayAmountUSD.toString()]);
+  log.info("Total Borrow Value In handleLiquidateBorrow before repayment: {}", [borrower.totalBorrowValueInEth.toString()]);
+  borrower.totalBorrowValueInEth = borrower.totalBorrowValueInEth.minus(repayAmountUSD);
+  log.info("Total Borrow Value In handleLiquidateBorrow after repayment: {}", [borrower.totalBorrowValueInEth.toString()]);
+
+  // 更新清算人和借款人的liquitity和shortfall
+  let comptroller = Comptroller.bind(
+    Address.fromString(comptrollerAddress)
+  );
+  let borrowerLpInfo = comptroller.getAccountLiquidity(
+    Address.fromString(borrowerID)
+  );
+  borrower.liquitity = borrowerLpInfo.value1.toBigDecimal();
+  borrower.shortfall = borrowerLpInfo.value2.toBigDecimal();
   borrower.save();
+
+  let liquidatorLpInfo = comptroller.getAccountLiquidity(
+    Address.fromString(liquidatorID)
+  );
+  liquidator.liquitity = liquidatorLpInfo.value1.toBigDecimal();
+  liquidator.shortfall = liquidatorLpInfo.value2.toBigDecimal();
+  liquidator.save();
 }
 
 /* Transferring of cTokens
@@ -299,13 +375,13 @@ export function handleTransfer(event: Transfer): void {
   if (!market) {
     return;
   }
-
+  // 绑定价格预言机合约
   let oracleAddress = Address.fromString(priceOracle);
   let oracle = PriceFeed.bind(oracleAddress);
   let usdPrice: BigDecimal;
 
   let currentPrice = oracle.try_getPrice(event.address);
-
+  // 获取cToken的当前价格
   if (currentPrice.reverted) {
     log.info("*** CALL FAILED *** : ERC20: getPrice() reverted.", [
       oracleAddress.toHex(),
@@ -315,6 +391,7 @@ export function handleTransfer(event: Transfer): void {
     usdPrice = currentPrice.value.toBigDecimal();
   }
 
+  // 如果市场的accrualBlockNumber与当前区块不同，则更新市场
   if (market.accrualBlockNumber != event.block.number.toI32()) {
     market = updateMarket(
       event.address,
@@ -323,9 +400,12 @@ export function handleTransfer(event: Transfer): void {
     );
   }
 
-  let underlyingDecimals = exponentToBigDecimal(market.underlyingDecimals);
-  usdPrice = usdPrice.div(mantissaFactorBD);
+    // 获取底层资产的精度
+    let underlyingDecimals = exponentToBigDecimal(market.underlyingDecimals);
+    // 调整usdPrice的精度
+    usdPrice = usdPrice.div(mantissaFactorBD);
 
+  // 计算底层资产的数量
   let amountUnderlying = market.exchangeRate.times(
     cTokenDecimalsBD.equals(zeroBD)
       ? zeroBD
@@ -337,14 +417,17 @@ export function handleTransfer(event: Transfer): void {
   );
 
   let accountFromID = event.params.from.toHex();
-
+  let accountToID = event.params.to.toHex();
+  
   // Checking if the tx is FROM the cToken contract (i.e. this will not run when minting)
   // If so, it is a mint, and we don't need to run these calculations
+    // 检查转出账户是否为cToken合约地址
   if (accountFromID != marketID) {
     let accountFrom = Account.load(accountFromID);
     if (accountFrom == null) {
-      createAccount(accountFromID);
+      accountFrom = createAccount(accountFromID);
     }
+
 
     // Update cTokenStats common for all events, and return the stats to update unique
     // values for each event
@@ -376,19 +459,20 @@ export function handleTransfer(event: Transfer): void {
     }
   }
 
-  let accountToID = event.params.to.toHex();
   // Checking if the tx is TO the cToken contract (i.e. this will not run when redeeming)
   // If so, we ignore it. this leaves an edge case, where someone who accidentally sends
   // cTokens to a cToken contract, where it will not get recorded. Right now it would
   // be messy to include, so we are leaving it out for now TODO fix this in future
+    // 检查转入账户是否为cToken合约地址
   if (accountToID != marketID) {
     let accountTo = Account.load(accountToID);
     if (accountTo == null) {
-      createAccount(accountToID);
+      accountTo = createAccount(accountToID);
     }
 
     // Update cTokenStats common for all events, and return the stats to update unique
     // values for each event
+        // 更新转入账户的cToken统计信息
     let cTokenStatsTo = updateCommonCTokenStats(
       market.id,
       market.symbol,
@@ -422,30 +506,29 @@ export function handleTransfer(event: Transfer): void {
       market.save();
     }
     
-
-    if (account) {
+    if (accountTo) {
       const cTokenBalanceDelta = event.params.amount
         .toBigDecimal()
         .times(usdPrice)
         .times(market.exchangeRate)
         .div(underlyingDecimals);
 
-      account.totalCollateralValueInEth =
-        account.totalCollateralValueInEth.plus(cTokenBalanceDelta);
+      accountTo.totalCollateralValueInEth =
+        accountTo.totalCollateralValueInEth.plus(cTokenBalanceDelta);
 
       log.info(
         `*** SUPPLY CALCULATION *** : AmountIn ${event.params.amount} totalCollateralValueInEth: cTokenBalanceDelta ${cTokenBalanceDelta} cTokenBalance ${cTokenStatsTo.cTokenBalance}, usdPrice ${usdPrice}, cTokenDecimalsBD ${cTokenDecimalsBD}, exchangeRate ${market.exchangeRate}`,
-        [account.id]
+        [accountTo.id]
       );
       let comptroller = Comptroller.bind(
-        Address.fromString("0x0777EACb29199ba125677968c43Ed754De64cC91")
+        Address.fromString(comptrollerAddress)
       );
-      
-      let accountLpInfo = comptroller.getAccountLiquidity(Address.fromString(account.id));
-      account.liquitity = accountLpInfo.value1.toBigDecimal();
-      account.shortfall = accountLpInfo.value2.toBigDecimal();
-      account.hasBorrowed = true;    
-      account.save();
+
+      let accountLpInfo = comptroller.getAccountLiquidity(Address.fromString(accountTo.id));
+      accountTo.liquitity = accountLpInfo.value1.toBigDecimal();
+      accountTo.shortfall = accountLpInfo.value2.toBigDecimal();
+      accountTo.hasBorrowed = true;    
+      accountTo.save();
     }
   }
 }

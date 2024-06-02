@@ -1,3 +1,15 @@
+type LiquidationBorrow @entity {
+  id: ID!
+  liquidator: Account!
+  borrower: Bytes!
+  repayAmount: BigInt!
+  seizeTokens: BigInt!
+  rTokenCollateral: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
 # Comptroller global variables
 type Comptroller @entity {
   "ID is set to 1"
@@ -88,6 +100,7 @@ type Account @entity {
   # The following values are added by the JS Wrapper, and must be calculated with the most up
   # to date values based on the block delta for market.exchangeRate and market.borrowIndex
   # They do not need to be in the schema, but they will show up in the explorer playground
+  liquidationEvents: [LiquidationBorrow!]! @derivedFrom(field: "liquidator")
 
   "Total assets supplied by user"
   totalBorrowValueInEth: BigDecimal!

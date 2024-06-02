@@ -8,7 +8,7 @@ dataSources:
     name: rSTONE
     network: scroll-sepolia
     source:
-      address: "0x10167973CDde2730fe283D95E74dd75DBB5CcaBC"
+      address: "0x39C39838Fa81e84952972B318507278134A1bb19"
       abi: RToken
       startBlock: 4200000
     mapping:
@@ -50,7 +50,7 @@ dataSources:
     name: rUSDC
     network: scroll-sepolia
     source:
-      address: "0xa3807e5A390C605c8b962C96aA3A78c5B0524F60"
+      address: "0xFC9b58a8cf8EA1183010394c418BAA0F48a9D7f8"
       abi: RToken
       startBlock: 4200000
     mapping:
@@ -92,7 +92,7 @@ dataSources:
     name: rUSDT
     network: scroll-sepolia
     source:
-      address: "0x80dbC380dF374e82f7A818f96B346517FD6fE6D1"
+      address: "0xb99B3FCC14d245cC064732564A04ce44D83Fc964"
       abi: RToken
       startBlock: 4200000
     mapping:
@@ -134,7 +134,7 @@ dataSources:
     name: rWBTC
     network: scroll-sepolia
     source:
-      address: "0x508F7F654De673f24838e42b161dE4c54044E54d"
+      address: "0x8A28C48B0a9267D8f4F01A4F8A9A8f98D3B511C0"
       abi: RToken
       startBlock: 4368368
     mapping:
@@ -176,7 +176,7 @@ dataSources:
     name: rWETH
     network: scroll-sepolia
     source:
-      address: "0xdC4E583a25735AF1Cb5904293a76324Aa1dDDc81"
+      address: "0x07F9aaB0D2fA83eC93edF3F472642489060Ab3Aa"
       abi: RToken
       startBlock: 4200000
     mapping:
@@ -218,7 +218,7 @@ dataSources:
     name: rETH
     network: scroll-sepolia
     source:
-      address: "0x7C40e4A46Bf2b33f39a0fC6FD382969dd83dEc52"
+      address: "0xECF8E05f965edA0c4b237092657FD04542aaC5F1"
       abi: RToken
       startBlock: 4200000
     mapping:
@@ -260,7 +260,7 @@ dataSources:
     name: Comptroller
     network: scroll-sepolia
     source:
-      address: "0xb08054f31d923B7D1a8aDDF8Bac7f88b1484cD27"
+      address: "0x06d083a4BA72E5DdEDA79C13ac9Ec574ADBbB459"
       abi: Comptroller
       startBlock: 4200000
     mapping:

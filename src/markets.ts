@@ -14,6 +14,11 @@ import {
   mantissaFactorBD,
   cTokenDecimalsBD,
   zeroBD,
+  daiAddress,
+  priceOracle,
+  rUSDCAddress,
+  rETHAddress,
+  USDCAddress
 } from "./helpers";
 import { Comptroller, Market } from "../generated/schema";
 import { RToken } from "../generated/rSTONE/RToken";
@@ -21,12 +26,7 @@ import { RERC20 } from "../generated/rSTONE/RERC20";
 import { ERC20 } from "../generated/rSTONE/ERC20";
 import { PriceFeed } from "../generated/Comptroller/PriceFeed";
 
-const daiAddress = "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359";
 
-const rUSDCAddress = "0xCfFF30BC471C31D2660066797BCFCFe7CF3690B0";
-const rETHAddress = "0x50581759977c2caaa5Fde5B62F8C2285a245C336";
-const USDCAddress = "0x0223b6C4cE652cCA5fec37f69abCF5DD3Dc1557C";
-const priceOracle = "0x04c8D4520aB5C067cEc9Ada61A26A8b46c12aaEA";
 
 // Used for all cERC20 contracts
 function getTokenPrice(
