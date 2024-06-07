@@ -45,9 +45,6 @@ export function handleBorrow(event: Borrow): void {
     account = createAccount(accountID);
   }
 
-  log.info("*** ACCOUNT *** : totalBorrowValueInEth init3: {}", [
-    account.totalBorrowValueInEth.toString(),
-  ]);
 
   if (!market) {
     return;
@@ -78,9 +75,6 @@ export function handleBorrow(event: Borrow): void {
     event.block.timestamp.toI32(),
     event.block.number.toI32()
   );
-  log.info("*** ACCOUNT *** : totalBorrowValueInEth init4: {}", [
-    account.totalBorrowValueInEth.toString(),
-  ]);
   let underlyingDecimals = exponentToBigDecimal(market.underlyingDecimals);
 
   usdPrice = usdPrice.div(mantissaFactorBD);
@@ -113,11 +107,9 @@ export function handleBorrow(event: Borrow): void {
 
   if (account) {
     const borrowAmountDelta = usdPrice.times(borrowAmountBD);
-    log.info("Total Borrow Value In handleBorrow after repayment: {}", [account.totalBorrowValueInEth.toString()]);
     // TODO - exchange rate
     account.totalBorrowValueInEth =
       account.totalBorrowValueInEth.plus(borrowAmountDelta);
-      log.info("Total Borrow Value In handleBorrow after repayment: {}", [account.totalBorrowValueInEth.toString()]);
 
     log.info(
       `*** BORROW CALCULATION *** : totalBorrowValueInEth: borrowAmountDelta ${borrowAmountDelta}, usdPrice ${usdPrice},  borrowAmountBD ${borrowAmountBD}, cTokenDecimalsBD ${cTokenDecimalsBD}, exchangeRate ${market.exchangeRate}`,
@@ -186,9 +178,6 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   if (account == null) {
     account = createAccount(accountID);
   }
-  log.info("*** ACCOUNT *** : totalBorrowValueInEth init1: {}", [
-    account.totalBorrowValueInEth.toString(),
-  ]);
   // Update cTokenStats common for all events, and return the stats to update unique
   // values for each event
   let cTokenStats = updateCommonCTokenStats(
@@ -216,12 +205,11 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   cTokenStats.accountBorrowIndex = market.borrowIndex;
   cTokenStats.totalUnderlyingRepaid =
     cTokenStats.totalUnderlyingRepaid.plus(repayAmountBD);
+
+  cTokenStats.totalUnderlyingBorrowed = cTokenStats.totalUnderlyingBorrowed.minus(repayAmountBD);
+  cTokenStats.totalUnderlyingBorrowedUSD = cTokenStats.totalUnderlyingBorrowed.times(usdPrice);
+
   cTokenStats.save();
-
-
-  log.info("*** ACCOUNT *** : totalBorrowValueInEth init2: {}", [
-    account.totalBorrowValueInEth.toString(),
-  ]);
 
   if (account && event.params.borrower) {
     // TODO - exchange rate
@@ -326,11 +314,22 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   usdPrice = usdPrice.div(mantissaFactorBD);
 
   let repayAmountUSD = event.params.repayAmount.toBigDecimal().div(underlyingDecimals).times(usdPrice);
-  log.info("Repay Amount: {}", [event.params.repayAmount.toString()]);
-  log.info("Repay Amount USD: {}", [repayAmountUSD.toString()]);
-  log.info("Total Borrow Value In handleLiquidateBorrow before repayment: {}", [borrower.totalBorrowValueInEth.toString()]);
   borrower.totalBorrowValueInEth = borrower.totalBorrowValueInEth.minus(repayAmountUSD);
-  log.info("Total Borrow Value In handleLiquidateBorrow after repayment: {}", [borrower.totalBorrowValueInEth.toString()]);
+
+
+  let cTokenStats = updateCommonCTokenStats(
+    market.id,
+    market.symbol,
+    borrowerID,
+    event.transaction.hash,
+    event.block.timestamp.toI32(),
+    event.block.number.toI32()
+  );
+
+  let repayAmountBD = event.params.repayAmount.toBigDecimal().div(underlyingDecimals);
+  cTokenStats.totalUnderlyingBorrowed = cTokenStats.totalUnderlyingBorrowed.minus(repayAmountBD);
+  cTokenStats.totalUnderlyingBorrowedUSD = cTokenStats.totalUnderlyingBorrowed.times(usdPrice);
+  cTokenStats.save();
 
   // 更新清算人和借款人的liquitity和shortfall
   let comptroller = Comptroller.bind(
