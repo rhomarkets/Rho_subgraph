@@ -167,6 +167,21 @@
     "type": "function",
     "name": "borrow",
     "inputs": [
+      {
+        "name": "borrowAmount",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      { "name": "dataHash", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "signature", "type": "bytes", "internalType": "bytes" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "borrow",
+    "inputs": [
       { "name": "borrowAmount", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
@@ -349,7 +364,35 @@
         "name": "rTokenCollateral",
         "type": "address",
         "internalType": "contract RTokenInterface"
+      },
+      { "name": "dataHash", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "signature", "type": "bytes", "internalType": "bytes" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "liquidateBorrow",
+    "inputs": [
+      { "name": "borrower", "type": "address", "internalType": "address" },
+      { "name": "repayAmount", "type": "uint256", "internalType": "uint256" },
+      {
+        "name": "rTokenCollateral",
+        "type": "address",
+        "internalType": "contract RTokenInterface"
       }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "mint",
+    "inputs": [
+      { "name": "mintAmount", "type": "uint256", "internalType": "uint256" },
+      { "name": "dataHash", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "signature", "type": "bytes", "internalType": "bytes" }
     ],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "nonpayable"
@@ -403,6 +446,21 @@
     "type": "function",
     "name": "redeem",
     "inputs": [
+      {
+        "name": "redeemTokens",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      { "name": "dataHash", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "signature", "type": "bytes", "internalType": "bytes" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "redeem",
+    "inputs": [
       { "name": "redeemTokens", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
@@ -419,9 +477,35 @@
   },
   {
     "type": "function",
+    "name": "redeemUnderlying",
+    "inputs": [
+      {
+        "name": "redeemAmount",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      { "name": "dataHash", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "signature", "type": "bytes", "internalType": "bytes" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "repayBorrow",
     "inputs": [
       { "name": "repayAmount", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "repayBorrow",
+    "inputs": [
+      { "name": "repayAmount", "type": "uint256", "internalType": "uint256" },
+      { "name": "dataHash", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "signature", "type": "bytes", "internalType": "bytes" }
     ],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "nonpayable"
@@ -432,6 +516,18 @@
     "inputs": [
       { "name": "borrower", "type": "address", "internalType": "address" },
       { "name": "repayAmount", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "repayBorrowBehalf",
+    "inputs": [
+      { "name": "borrower", "type": "address", "internalType": "address" },
+      { "name": "repayAmount", "type": "uint256", "internalType": "uint256" },
+      { "name": "dataHash", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "signature", "type": "bytes", "internalType": "bytes" }
     ],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "nonpayable"

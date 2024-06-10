@@ -25,7 +25,6 @@ import { createMarket, updateMarket } from "./markets";
 import { PriceFeed } from "../generated/Comptroller/PriceFeed";
 import { Comptroller } from "../generated/Comptroller/Comptroller";
 
-
 /* Borrow assets from the protocol. All values either ETH or ERC20
  *
  * event.params.totalBorrows = of the whole market (not used right now)
@@ -106,7 +105,7 @@ export function handleBorrow(event: Borrow): void {
   cTokenStats.save();
 
   if (account) {
-    const borrowAmountDelta = usdPrice.times(borrowAmountBD);
+    const borrowAmountDelta = usdPrice.times(borrowAmountBD).times(market.exchangeRate);
     // TODO - exchange rate
     account.totalBorrowValueInEth =
       account.totalBorrowValueInEth.plus(borrowAmountDelta);
@@ -206,23 +205,20 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   cTokenStats.totalUnderlyingRepaid =
     cTokenStats.totalUnderlyingRepaid.plus(repayAmountBD);
 
-  cTokenStats.totalUnderlyingBorrowed = cTokenStats.totalUnderlyingBorrowed.minus(repayAmountBD);
-  cTokenStats.totalUnderlyingBorrowedUSD = cTokenStats.totalUnderlyingBorrowed.times(usdPrice);
+  // cTokenStats.totalUnderlyingBorrowed = cTokenStats.totalUnderlyingBorrowed.minus(repayAmountBD);
+  // cTokenStats.totalUnderlyingBorrowedUSD = cTokenStats.totalUnderlyingBorrowed.times(usdPrice);
 
   cTokenStats.save();
 
-  if (account && event.params.borrower) {
-    // TODO - exchange rate
-
+  if (account) {
     const repayAmountDelta = repayAmountBD
       .times(usdPrice)
       .times(market.exchangeRate);
 
     account.totalBorrowValueInEth =
       account.totalBorrowValueInEth.minus(repayAmountDelta);
-
+         log.info(`*** DISPLAY *** : totalBorrowValueInEth after repay: ${account.totalBorrowValueInEth.toString()}`, []);
   }
-
   let comptroller = Comptroller.bind(
     Address.fromString(comptrollerAddress)
   );
@@ -257,6 +253,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
  *    add liquidation counts in this handler.
  */
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
+
   // 加载或创建清算人账户
   let liquidatorID = event.params.liquidator.toHex();
   let liquidator = Account.load(liquidatorID);
@@ -313,23 +310,23 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
     // 调整usdPrice的精度
   usdPrice = usdPrice.div(mantissaFactorBD);
 
-  let repayAmountUSD = event.params.repayAmount.toBigDecimal().div(underlyingDecimals).times(usdPrice);
-  borrower.totalBorrowValueInEth = borrower.totalBorrowValueInEth.minus(repayAmountUSD);
+  // let repayAmountUSD = event.params.repayAmount.toBigDecimal().div(underlyingDecimals).times(usdPrice).times(market.exchangeRate);
+  // borrower.totalBorrowValueInEth = borrower.totalBorrowValueInEth.minus(repayAmountUSD);
+  // log.info(`*** DISPLAY *** : totalBorrowValueInEth after liquidation: ${borrower.totalBorrowValueInEth.toString()}`, []);
 
+  // let cTokenStats = updateCommonCTokenStats(
+  //   market.id,
+  //   market.symbol,
+  //   borrowerID,
+  //   event.transaction.hash,
+  //   event.block.timestamp.toI32(),
+  //   event.block.number.toI32()
+  // );
 
-  let cTokenStats = updateCommonCTokenStats(
-    market.id,
-    market.symbol,
-    borrowerID,
-    event.transaction.hash,
-    event.block.timestamp.toI32(),
-    event.block.number.toI32()
-  );
-
-  let repayAmountBD = event.params.repayAmount.toBigDecimal().div(underlyingDecimals);
-  cTokenStats.totalUnderlyingBorrowed = cTokenStats.totalUnderlyingBorrowed.minus(repayAmountBD);
-  cTokenStats.totalUnderlyingBorrowedUSD = cTokenStats.totalUnderlyingBorrowed.times(usdPrice);
-  cTokenStats.save();
+  // let repayAmountBD = event.params.repayAmount.toBigDecimal().div(underlyingDecimals);
+  // cTokenStats.totalUnderlyingBorrowed = cTokenStats.totalUnderlyingBorrowed.minus(repayAmountBD);
+  // cTokenStats.totalUnderlyingBorrowedUSD = cTokenStats.totalUnderlyingBorrowed.times(usdPrice);
+  // cTokenStats.save();
 
   // 更新清算人和借款人的liquitity和shortfall
   let comptroller = Comptroller.bind(
@@ -382,9 +379,6 @@ export function handleTransfer(event: Transfer): void {
   let currentPrice = oracle.try_getPrice(event.address);
   // 获取cToken的当前价格
   if (currentPrice.reverted) {
-    log.info("*** CALL FAILED *** : ERC20: getPrice() reverted.", [
-      oracleAddress.toHex(),
-    ]);
     usdPrice = zeroBD;
   } else {
     usdPrice = currentPrice.value.toBigDecimal();
@@ -420,14 +414,12 @@ export function handleTransfer(event: Transfer): void {
   
   // Checking if the tx is FROM the cToken contract (i.e. this will not run when minting)
   // If so, it is a mint, and we don't need to run these calculations
-    // 检查转出账户是否为cToken合约地址
+  // 检查转出账户是否为cToken合约地址（即，提现事件）
   if (accountFromID != marketID) {
     let accountFrom = Account.load(accountFromID);
     if (accountFrom == null) {
       accountFrom = createAccount(accountFromID);
     }
-
-
     // Update cTokenStats common for all events, and return the stats to update unique
     // values for each event
     let cTokenStatsFrom = updateCommonCTokenStats(
@@ -444,20 +436,24 @@ export function handleTransfer(event: Transfer): void {
         ? zeroBD
         : event.params.amount
             .toBigDecimal()
-            .div(cTokenDecimalsBD)
-            .truncate(cTokenDecimals)
+            .div(underlyingDecimals)
     );
-
     cTokenStatsFrom.totalUnderlyingRedeemed =
       cTokenStatsFrom.totalUnderlyingRedeemed.plus(amountUnderylingTruncated);
     cTokenStatsFrom.save();
 
+    const collateralDelta = amountUnderlying.times(usdPrice);
+    accountFrom.totalCollateralValueInEth =
+      accountFrom.totalCollateralValueInEth.minus(collateralDelta);
+    log.info(`*** DISPLAY *** : totalCollateralValueInEth after withdraw: ${accountFrom.totalCollateralValueInEth.toString()}`, []);
+    accountFrom.save();
     if (cTokenStatsFrom.cTokenBalance.equals(zeroBD)) {
       market.numberOfSuppliers = market.numberOfSuppliers - 1;
       market.save();
     }
-  }
 
+
+  }
   // Checking if the tx is TO the cToken contract (i.e. this will not run when redeeming)
   // If so, we ignore it. this leaves an edge case, where someone who accidentally sends
   // cTokens to a cToken contract, where it will not get recorded. Right now it would
@@ -487,14 +483,13 @@ export function handleTransfer(event: Transfer): void {
         ? zeroBD
         : event.params.amount
             .toBigDecimal()
-            .div(cTokenDecimalsBD)
-            .truncate(cTokenDecimals)
+            .div(underlyingDecimals)
     );
 
     cTokenStatsTo.totalUnderlyingSupplied =
       cTokenStatsTo.totalUnderlyingSupplied.plus(amountUnderylingTruncated);
     cTokenStatsTo.totalUnderlyingSuppliedUSD =
-      cTokenStatsTo.totalUnderlyingSupplied.times(market.underlyingPrice);
+      cTokenStatsTo.totalUnderlyingSupplied.times(usdPrice);
     cTokenStatsTo.save();
 
     if (

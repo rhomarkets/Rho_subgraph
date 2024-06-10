@@ -7,5 +7,15 @@
     "": {
       "address": "0x86d15bF19A5FEd1C8bC700fa82Bae59e4E705a62"
     }
+  },
+  "base-sepolia": {
+    "rSTONE": {
+      "address": "0x60F31D46555665F4BC6636F75F6A4B91A7f7094f",
+      "startBlock": 11089000
+    },
+    "": {
+      "address": "0x86d15bF19A5FEd1C8bC700fa82Bae59e4E705a62"
+    }
   }
 }
+

@@ -252,7 +252,8 @@ export function updateMarket(
     market.blockTimestamp = blockTimestamp;
     market.totalSupply = cTokenDecimalsBD.equals(zeroBD)
       ? zeroBD
-      : contract.totalSupply().toBigDecimal().div(cTokenDecimalsBD);
+      : contract.totalSupply().toBigDecimal().div(exponentToBigDecimal(market.underlyingDecimals))
+      .truncate(market.underlyingDecimals);
     market.liquidationThresholdUSD = market.totalSupply
       .times(market.underlyingPrice)
       .times(market.collateralFactor);
@@ -277,7 +278,6 @@ export function updateMarket(
         .toBigDecimal()
         .div(exponentToBigDecimal(mantissaFactor));
     }
-
     if (mantissaFactorBD.equals(zeroBD)) {
       market.borrowIndex = zeroBD;
       market.supplyRate = zeroBD;
@@ -288,13 +288,9 @@ export function updateMarket(
         .div(mantissaFactorBD)
         .truncate(mantissaFactor);
 
-      // Must convert to BigDecimal, and remove 10^18 that is used for Exp in Compound Solidity
       market.supplyRate = contract
-        .borrowRatePerBlock()
-        .toBigDecimal()
-        .times(BigDecimal.fromString("2102400"))
-        .div(mantissaFactorBD)
-        .truncate(mantissaFactor);
+      .supplyRatePerBlock()
+      .toBigDecimal()
     }
 
     if (underlyingDecimals.equals(zeroBD)) {
@@ -307,6 +303,7 @@ export function updateMarket(
         .toBigDecimal()
         .div(exponentToBigDecimal(market.underlyingDecimals))
         .truncate(market.underlyingDecimals);
+
 
       market.totalBorrows = contract
         .totalBorrows()
@@ -323,19 +320,17 @@ export function updateMarket(
 
     // This fails on only the first call to cZRX. It is unclear why, but otherwise it works.
     // So we handle it like this.
-    let supplyRatePerBlock = contract.try_supplyRatePerBlock();
-    if (supplyRatePerBlock.reverted) {
-      log.info("***CALL FAILED*** : cERC20 supplyRatePerBlock() reverted", []);
+    let borrowRatePerBlock = contract.try_borrowRatePerBlock();
+    if (borrowRatePerBlock.reverted) {
+      log.info("***CALL FAILED*** : cERC20 borrowRatePerBlock() reverted", []);
       market.borrowRate = zeroBD;
     } else {
       if (mantissaFactorBD.equals(zeroBD)) {
         market.borrowRate = zeroBD;
       } else {
-        market.borrowRate = supplyRatePerBlock.value
+        market.borrowRate = borrowRatePerBlock.value
           .toBigDecimal()
-          .times(BigDecimal.fromString("2102400"))
-          .div(mantissaFactorBD)
-          .truncate(mantissaFactor);
+     
       }
     }
     market.save();
