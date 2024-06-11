@@ -94,7 +94,7 @@ export function handleBorrow(event: Borrow): void {
         .toBigDecimal()
         .div(underlyingDecimals)
         .truncate(market.underlyingDecimals);
-
+    cTokenStats.storedBorrowBalanceUSD = cTokenStats.storedBorrowBalance.times(usdPrice)
   cTokenStats.accountBorrowIndex = market.borrowIndex;
   cTokenStats.totalUnderlyingBorrowed =
     cTokenStats.totalUnderlyingBorrowed.plus(borrowAmountBD);
@@ -200,6 +200,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
         .toBigDecimal()
         .div(underlyingDecimals)
         .truncate(market.underlyingDecimals);
+  cTokenStats.storedBorrowBalanceUSD = cTokenStats.storedBorrowBalance.times(usdPrice)
 
   cTokenStats.accountBorrowIndex = market.borrowIndex;
   cTokenStats.totalUnderlyingRepaid =
@@ -438,6 +439,8 @@ export function handleTransfer(event: Transfer): void {
             .toBigDecimal()
             .div(underlyingDecimals)
     );
+    cTokenStatsFrom.cTokenBalanceUSD = cTokenStatsFrom.cTokenBalance.times(usdPrice)
+    
     cTokenStatsFrom.totalUnderlyingRedeemed =
       cTokenStatsFrom.totalUnderlyingRedeemed.plus(amountUnderylingTruncated);
     cTokenStatsFrom.save();
@@ -485,6 +488,7 @@ export function handleTransfer(event: Transfer): void {
             .toBigDecimal()
             .div(underlyingDecimals)
     );
+    cTokenStatsTo.cTokenBalanceUSD = cTokenStatsTo.cTokenBalance.times(usdPrice)
 
     cTokenStatsTo.totalUnderlyingSupplied =
       cTokenStatsTo.totalUnderlyingSupplied.plus(amountUnderylingTruncated);

@@ -37,6 +37,7 @@ export function createAccountCToken(
   cTokenStats.transactionTimes = [];
   cTokenStats.accrualBlockNumber = 0;
   cTokenStats.cTokenBalance = zeroBD;
+  cTokenStats.cTokenBalanceUSD = zeroBD;
   cTokenStats.totalUnderlyingSupplied = zeroBD;
   cTokenStats.totalUnderlyingSuppliedUSD = zeroBD;
   cTokenStats.totalUnderlyingRedeemed = zeroBD;
@@ -45,6 +46,7 @@ export function createAccountCToken(
   cTokenStats.totalUnderlyingBorrowedUSD = zeroBD;
   cTokenStats.totalUnderlyingRepaid = zeroBD;
   cTokenStats.storedBorrowBalance = zeroBD;
+  cTokenStats.storedBorrowBalanceUSD = zeroBD;
   cTokenStats.enteredMarket = false;
   return cTokenStats;
 }
