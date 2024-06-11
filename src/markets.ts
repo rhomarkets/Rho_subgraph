@@ -14,11 +14,9 @@ import {
   mantissaFactorBD,
   cTokenDecimalsBD,
   zeroBD,
-  daiAddress,
   priceOracle,
   rUSDCAddress,
-  rETHAddress,
-  USDCAddress
+  rETHAddress
 } from "./helpers";
 import { Comptroller, Market } from "../generated/schema";
 import { RToken } from "../generated/rSTONE/RToken";
@@ -150,26 +148,24 @@ export function createMarket(marketAddress: string): Market {
       market.underlyingDecimals = decimals.value;
     }
 
-    if (market.underlyingAddress.toHexString() != daiAddress) {
-      let name = underlyingContract.try_name();
-      let symbol = underlyingContract.try_symbol();
-      if (name.reverted) {
-        log.info("*** CALL FAILED *** : ERC20: name() reverted.", [
-          market.underlyingAddress.toHex(),
-        ]);
-        market.underlyingName = "";
-      } else {
-        market.underlyingName = name.value;
-      }
+    let name = underlyingContract.try_name();
+    let symbol = underlyingContract.try_symbol();
+    if (name.reverted) {
+      log.info("*** CALL FAILED *** : ERC20: name() reverted.", [
+        market.underlyingAddress.toHex(),
+      ]);
+      market.underlyingName = "";
+    } else {
+      market.underlyingName = name.value;
+    }
 
-      if (symbol.reverted) {
-        log.info("*** CALL FAILED *** : ERC20: symbol() reverted.", [
-          market.underlyingAddress.toHex(),
-        ]);
-        market.underlyingSymbol = "";
-      } else {
-        market.underlyingSymbol = symbol.value;
-      }
+    if (symbol.reverted) {
+      log.info("*** CALL FAILED *** : ERC20: symbol() reverted.", [
+        market.underlyingAddress.toHex(),
+      ]);
+      market.underlyingSymbol = "";
+    } else {
+      market.underlyingSymbol = symbol.value;
     }
 
     if (marketAddress == rUSDCAddress) {

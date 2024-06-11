@@ -61,7 +61,7 @@ export function handleNewCloseFactor(event: NewCloseFactor): void {
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
   let market = Market.load(event.params.rToken.toHexString());
 
-    if (!market) {
+  if (!market) {
     return;
   }
 
