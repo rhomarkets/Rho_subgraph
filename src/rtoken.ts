@@ -88,25 +88,23 @@ export function handleBorrow(event: Borrow): void {
 
   let previousBorrow = cTokenStats.storedBorrowBalance;
 
-  cTokenStats.storedBorrowBalance = underlyingDecimals.equals(zeroBD)
+  cTokenStats.totalUnderlyingBorrowed = underlyingDecimals.equals(zeroBD)
     ? zeroBD
     : event.params.accountBorrows
         .toBigDecimal()
         .div(underlyingDecimals)
         .truncate(market.underlyingDecimals);
-    cTokenStats.storedBorrowBalanceUSD = cTokenStats.storedBorrowBalance.times(usdPrice)
-  cTokenStats.accountBorrowIndex = market.borrowIndex;
-  cTokenStats.totalUnderlyingBorrowed =
-    cTokenStats.totalUnderlyingBorrowed.plus(borrowAmountBD);
+    cTokenStats.storedBorrowBalanceUSD = cTokenStats.totalUnderlyingBorrowed.times(usdPrice);
 
-  cTokenStats.totalUnderlyingBorrowedUSD =
-    cTokenStats.totalUnderlyingBorrowed.times(market.underlyingPrice);
+    cTokenStats.storedBorrowBalance = cTokenStats.totalUnderlyingBorrowed.div(market.exchangeRate);
+
+  cTokenStats.accountBorrowIndex = market.borrowIndex;
+
 
   cTokenStats.save();
 
   if (account) {
-    const borrowAmountDelta = usdPrice.times(borrowAmountBD).times(market.exchangeRate);
-    // TODO - exchange rate
+    const borrowAmountDelta = usdPrice.times(borrowAmountBD);
     account.totalBorrowValueInEth =
       account.totalBorrowValueInEth.plus(borrowAmountDelta);
 
@@ -194,27 +192,27 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     ? zeroBD
     : event.params.repayAmount.toBigDecimal().div(underlyingDecimals);
 
-  cTokenStats.storedBorrowBalance = underlyingDecimals.equals(zeroBD)
+  cTokenStats.totalUnderlyingBorrowed= underlyingDecimals.equals(zeroBD)
     ? zeroBD
     : event.params.accountBorrows
         .toBigDecimal()
         .div(underlyingDecimals)
         .truncate(market.underlyingDecimals);
-  cTokenStats.storedBorrowBalanceUSD = cTokenStats.storedBorrowBalance.times(usdPrice)
+  cTokenStats.storedBorrowBalanceUSD = cTokenStats.totalUnderlyingBorrowed.times(usdPrice)
+  cTokenStats.storedBorrowBalance = cTokenStats.totalUnderlyingBorrowed.div(market.exchangeRate);
 
   cTokenStats.accountBorrowIndex = market.borrowIndex;
   cTokenStats.totalUnderlyingRepaid =
     cTokenStats.totalUnderlyingRepaid.plus(repayAmountBD);
 
-  // cTokenStats.totalUnderlyingBorrowed = cTokenStats.totalUnderlyingBorrowed.minus(repayAmountBD);
-  // cTokenStats.totalUnderlyingBorrowedUSD = cTokenStats.totalUnderlyingBorrowed.times(usdPrice);
+
 
   cTokenStats.save();
 
   if (account) {
     const repayAmountDelta = repayAmountBD
-      .times(usdPrice)
-      .times(market.exchangeRate);
+      .times(usdPrice);
+      // .times(market.exchangeRate);
 
     account.totalBorrowValueInEth =
       account.totalBorrowValueInEth.minus(repayAmountDelta);
@@ -326,7 +324,6 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 
   // let repayAmountBD = event.params.repayAmount.toBigDecimal().div(underlyingDecimals);
   // cTokenStats.totalUnderlyingBorrowed = cTokenStats.totalUnderlyingBorrowed.minus(repayAmountBD);
-  // cTokenStats.totalUnderlyingBorrowedUSD = cTokenStats.totalUnderlyingBorrowed.times(usdPrice);
   // cTokenStats.save();
 
   // 更新清算人和借款人的liquitity和shortfall
@@ -440,9 +437,10 @@ export function handleTransfer(event: Transfer): void {
             .div(underlyingDecimals)
     );
     cTokenStatsFrom.cTokenBalanceUSD = cTokenStatsFrom.cTokenBalance.times(usdPrice)
-    
+    cTokenStatsFrom.totalUnderlyingSupplied = cTokenStatsFrom.cTokenBalance.div(market.exchangeRate);
+
     cTokenStatsFrom.totalUnderlyingRedeemed =
-      cTokenStatsFrom.totalUnderlyingRedeemed.plus(amountUnderylingTruncated);
+    cTokenStatsFrom.totalUnderlyingRedeemed.plus(amountUnderylingTruncated);
     cTokenStatsFrom.save();
 
     const collateralDelta = amountUnderlying.times(usdPrice);
@@ -488,12 +486,10 @@ export function handleTransfer(event: Transfer): void {
             .toBigDecimal()
             .div(underlyingDecimals)
     );
-    cTokenStatsTo.cTokenBalanceUSD = cTokenStatsTo.cTokenBalance.times(usdPrice)
 
-    cTokenStatsTo.totalUnderlyingSupplied =
-      cTokenStatsTo.totalUnderlyingSupplied.plus(amountUnderylingTruncated);
-    cTokenStatsTo.totalUnderlyingSuppliedUSD =
-      cTokenStatsTo.totalUnderlyingSupplied.times(usdPrice);
+    cTokenStatsTo.cTokenBalanceUSD = cTokenStatsTo.cTokenBalance.times(usdPrice).times(market.exchangeRate);
+    cTokenStatsTo.totalUnderlyingSupplied = cTokenStatsTo.cTokenBalance.div(market.exchangeRate);
+
     cTokenStatsTo.save();
 
     if (

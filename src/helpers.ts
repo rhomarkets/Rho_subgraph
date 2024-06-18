@@ -2,12 +2,12 @@
 import { Address, BigDecimal, Bytes } from "@graphprotocol/graph-ts/index";
 import { Account, AccountCToken } from "../generated/schema";
 
-export const comptrollerAddress = "0x4960278F9584c988ff76213D05B9956eE4327E05"; //UNITROLLER
-export const priceOracle = "0xa6fb4C9e62156B49c47791D3524dba60B067D5Aa";
+export const comptrollerAddress = "0x3C7053a0556D623169BCF4c199d4600B4B5232a5"; //UNITROLLER
+export const priceOracle = "0x86c0e117183F565c4CcF6974B7B7100c2BA9ccdA";
 export const daiAddress = "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359"; 
-export const rUSDCAddress = "0x142B5388575ffA6Ec84166ac70462fc9139b1c5f";
-export const rETHAddress = "0xF873413AA072BFcdD97e81f74B190FFFB9110f42";
-export const USDCAddress = "0x6c8dEcB3639a8B693BfB6cBdF0A9DE351F0419dC";
+export const rUSDCAddress = "0x30A91E5271BB9be116AaE4010fa09f9A20B91915";
+export const rETHAddress = "0x0EdD29C0b94920CeF8Ee6de818a435C2D58655A5";
+export const USDCAddress = "0x981CcfF2e944D69D99778818249Dc227dc6AC99F";
 
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
   let bd = BigDecimal.fromString("1");
@@ -39,11 +39,9 @@ export function createAccountCToken(
   cTokenStats.cTokenBalance = zeroBD;
   cTokenStats.cTokenBalanceUSD = zeroBD;
   cTokenStats.totalUnderlyingSupplied = zeroBD;
-  cTokenStats.totalUnderlyingSuppliedUSD = zeroBD;
   cTokenStats.totalUnderlyingRedeemed = zeroBD;
   cTokenStats.accountBorrowIndex = zeroBD;
   cTokenStats.totalUnderlyingBorrowed = zeroBD;
-  cTokenStats.totalUnderlyingBorrowedUSD = zeroBD;
   cTokenStats.totalUnderlyingRepaid = zeroBD;
   cTokenStats.storedBorrowBalance = zeroBD;
   cTokenStats.storedBorrowBalanceUSD = zeroBD;
