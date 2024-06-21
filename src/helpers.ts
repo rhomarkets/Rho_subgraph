@@ -2,12 +2,12 @@
 import { Address, BigDecimal, Bytes } from "@graphprotocol/graph-ts/index";
 import { Account, AccountCToken } from "../generated/schema";
 
-export const comptrollerAddress = "0x3C7053a0556D623169BCF4c199d4600B4B5232a5"; //UNITROLLER
-export const priceOracle = "0x86c0e117183F565c4CcF6974B7B7100c2BA9ccdA";
+export const comptrollerAddress = "0x07cF6A9f4115eb35c58E89973D858A1535561c95"; //UNITROLLER
+export const priceOracle = "0x04403b4930c17D564DdCe50Fa8959269B1477306";
 export const daiAddress = "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359"; 
-export const rUSDCAddress = "0x30A91E5271BB9be116AaE4010fa09f9A20B91915";
-export const rETHAddress = "0x0EdD29C0b94920CeF8Ee6de818a435C2D58655A5";
-export const USDCAddress = "0x981CcfF2e944D69D99778818249Dc227dc6AC99F";
+export const rUSDCAddress = "0x8C23DF724D0405c68f23981fDa8bE3BA3De32Bc6";
+export const rETHAddress = "0x5d2617677e01bC7e9c0a87F41097B6C0b7fE104b";
+export const USDCAddress = "0xc274000c77018862f55178550DeABE42475EA531";
 
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
   let bd = BigDecimal.fromString("1");

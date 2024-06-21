@@ -8,7 +8,7 @@ dataSources:
     name: rETH
     network: base-sepolia
     source:
-      address: "0x0EdD29C0b94920CeF8Ee6de818a435C2D58655A5"
+      address: "0x5d2617677e01bC7e9c0a87F41097B6C0b7fE104b"
       abi: RToken
       startBlock: 11340000
     mapping:
@@ -50,7 +50,7 @@ dataSources:
     name: rSTONE
     network: base-sepolia
     source:
-      address: "0x3594BA975A2638b0483a1F98826BB768B9CBAD22"
+      address: "0x00E91ffE9555413143F6B2Ba06b0c90520298246"
       abi: RToken
       startBlock: 11340000
     mapping:
@@ -92,7 +92,7 @@ dataSources:
     name: rUSDC
     network: base-sepolia
     source:
-      address: "0x30A91E5271BB9be116AaE4010fa09f9A20B91915"
+      address: "0x8C23DF724D0405c68f23981fDa8bE3BA3De32Bc6"
       abi: RToken
       startBlock: 11340000
     mapping:
@@ -134,7 +134,7 @@ dataSources:
     name: rUSDT
     network: base-sepolia
     source:
-      address: "0x7E9A2adAd530dd579A093Edf428E49a662a12d8F"
+      address: "0x3C685cA741a769FEc8C3776F3ff2038573a082e5"
       abi: RToken
       startBlock: 11340000
     mapping:
@@ -176,7 +176,7 @@ dataSources:
     name: rweETH
     network: base-sepolia
     source:
-      address: "0x26d8d341161e6E8bC19dCD16A1473f0024bD42e2"
+      address: "0x1fA29655b4eddcdD57Ae5D064264B273Cb720026"
       abi: RToken
       startBlock: 11340000
     mapping:
@@ -218,7 +218,7 @@ dataSources:
     name: rwstETH
     network: base-sepolia
     source:
-      address: "0x2f4D93f4546f8DBf710cC8574f66cD1486171fDD"
+      address: "0x6385bd0581e77cCe27f8e8cd18d86Ab35DEba712"
       abi: RToken
       startBlock: 11340000
     mapping:
@@ -260,7 +260,7 @@ dataSources:
     name: rsolvBTC
     network: base-sepolia
     source:
-      address: "0x12E662837B7416A8A94225B853CebDD3F4CfbfCf"
+      address: "0xB0FAD2801858eb9d8A6Ec0114E59B9C62334A98D"
       abi: RToken
       startBlock: 11340000
     mapping:
@@ -302,7 +302,7 @@ dataSources:
     name: Comptroller
     network: base-sepolia
     source:
-      address: "0x3C7053a0556D623169BCF4c199d4600B4B5232a5"
+      address: "0x07cF6A9f4115eb35c58E89973D858A1535561c95"
       abi: Comptroller
       startBlock: 11340000
     mapping:
