@@ -4,10 +4,10 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --studio base-sepolia",
-    "create-local": "graph create --node http://localhost:8020/ base-sepolia",
-    "remove-local": "graph remove --node http://localhost:8020/ base-sepolia",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 base-sepolia",
+    "deploy": "graph deploy --studio scroll-staging",
+    "create-local": "graph create --node http://localhost:8020/ scroll-staging",
+    "remove-local": "graph remove --node http://localhost:8020/ scroll-staging",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 scroll-staging",
     "test": "graph test"
   },
   "dependencies": {
