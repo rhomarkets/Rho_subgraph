@@ -37,11 +37,9 @@ export function createAccountCToken(
   cTokenStats.cTokenBalance = zeroBD;
   cTokenStats.cTokenBalanceUSD = zeroBD;
   cTokenStats.totalUnderlyingSupplied = zeroBD;
-  cTokenStats.totalUnderlyingSuppliedUSD = zeroBD;
   cTokenStats.totalUnderlyingRedeemed = zeroBD;
   cTokenStats.accountBorrowIndex = zeroBD;
   cTokenStats.totalUnderlyingBorrowed = zeroBD;
-  cTokenStats.totalUnderlyingBorrowedUSD = zeroBD;
   cTokenStats.totalUnderlyingRepaid = zeroBD;
   cTokenStats.storedBorrowBalance = zeroBD;
   cTokenStats.storedBorrowBalanceUSD = zeroBD;
