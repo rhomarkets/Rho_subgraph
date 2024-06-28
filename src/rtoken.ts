@@ -110,6 +110,9 @@ export function handleBorrow(event: Borrow): void {
     account.totalBorrowValueInEth =
       account.totalBorrowValueInEth.plus(borrowAmountDelta);
 
+    if (account.totalBorrowValueInEth < zeroBD) {
+      account.totalBorrowValueInEth = zeroBD;
+    }
     log.info(
       `*** BORROW CALCULATION *** : totalBorrowValueInEth: borrowAmountDelta ${borrowAmountDelta}, usdPrice ${usdPrice},  borrowAmountBD ${borrowAmountBD}, cTokenDecimalsBD ${cTokenDecimalsBD}, exchangeRate ${market.exchangeRate}`,
       [account.id]
@@ -222,7 +225,14 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 
     account.totalBorrowValueInEth =
       account.totalBorrowValueInEth.minus(repayAmountDelta);
-      log.info(`*** DISPLAY *** : totalBorrowValueInEth after repay: ${account.totalBorrowValueInEth.toString()}`, []);
+    if (account.totalBorrowValueInEth < zeroBD) {
+      account.totalBorrowValueInEth = zeroBD;
+    }
+
+    log.info(
+      `*** DISPLAY *** : totalBorrowValueInEth after repay: ${account.totalBorrowValueInEth.toString()}`,
+      []
+    );
   }
   let comptroller = Comptroller.bind(Address.fromString(comptrollerAddress));
   let accountLpInfo = comptroller.try_getAccountLiquidity(
@@ -262,7 +272,6 @@ export function handleRepayBorrow(event: RepayBorrow): void {
  *    add liquidation counts in this handler.
  */
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-
   // 加载或创建清算人账户
   let liquidatorID = event.params.liquidator.toHex();
   let liquidator = Account.load(liquidatorID);
@@ -319,7 +328,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   // 调整usdPrice的精度
   usdPrice = usdPrice.div(mantissaFactorBD);
 
-  // let repayAmountUSD = event.params.repayAmount.toBigDecimal().div(underlyingDecimals).times(usdPrice).times(market.exchangeRate);
+  // let repayAmountUSD = event.params.repayAmount.toBigDecimal().div(underlyingDecimals).times(usdPrice);
   // borrower.totalBorrowValueInEth = borrower.totalBorrowValueInEth.minus(repayAmountUSD);
   // log.info(`*** DISPLAY *** : totalBorrowValueInEth after liquidation: ${borrower.totalBorrowValueInEth.toString()}`, []);
 
@@ -467,13 +476,14 @@ export function handleTransfer(event: Transfer): void {
     const collateralDelta = amountUnderlying.times(usdPrice);
     accountFrom.totalCollateralValueInEth =
       accountFrom.totalCollateralValueInEth.minus(collateralDelta);
+      if (accountFrom.totalCollateralValueInEth < zeroBD) {
+        accountFrom.totalCollateralValueInEth = zeroBD;
+    }
     accountFrom.save();
     if (cTokenStatsFrom.cTokenBalance.equals(zeroBD)) {
       market.numberOfSuppliers = market.numberOfSuppliers - 1;
       market.save();
     }
-
-
   }
   // Checking if the tx is TO the cToken contract (i.e. this will not run when redeeming)
   // If so, we ignore it. this leaves an edge case, where someone who accidentally sends
