@@ -4,10 +4,10 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --studio scroll-staging",
-    "create-local": "graph create --node http://localhost:8020/ scroll-staging",
-    "remove-local": "graph remove --node http://localhost:8020/ scroll-staging",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 scroll-staging",
+    "deploy": "graph deploy --studio rho-markets-mainnet",
+    "create-local": "graph create --node http://localhost:8020/ rho-markets-mainnet",
+    "remove-local": "graph remove --node http://localhost:8020/ rho-markets-mainnet",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 rho-markets-mainnet",
     "test": "graph test"
   },
   "dependencies": {
