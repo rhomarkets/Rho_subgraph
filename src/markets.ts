@@ -14,19 +14,16 @@ import {
   mantissaFactorBD,
   cTokenDecimalsBD,
   zeroBD,
-  daiAddress,
   priceOracle,
   rUSDCAddress,
   rETHAddress,
-  USDCAddress
+  USDCAddress,
 } from "./helpers";
 import { Comptroller, Market } from "../generated/schema";
 import { RToken } from "../generated/rSTONE/RToken";
 import { RERC20 } from "../generated/rSTONE/RERC20";
 import { ERC20 } from "../generated/rSTONE/ERC20";
 import { PriceFeed } from "../generated/Comptroller/PriceFeed";
-
-
 
 // Used for all cERC20 contracts
 function getTokenPrice(
@@ -150,26 +147,24 @@ export function createMarket(marketAddress: string): Market {
       market.underlyingDecimals = decimals.value;
     }
 
-    if (market.underlyingAddress.toHexString() != daiAddress) {
-      let name = underlyingContract.try_name();
-      let symbol = underlyingContract.try_symbol();
-      if (name.reverted) {
-        log.info("*** CALL FAILED *** : ERC20: name() reverted.", [
-          market.underlyingAddress.toHex(),
-        ]);
-        market.underlyingName = "";
-      } else {
-        market.underlyingName = name.value;
-      }
+    let name = underlyingContract.try_name();
+    let symbol = underlyingContract.try_symbol();
+    if (name.reverted) {
+      log.info("*** CALL FAILED *** : ERC20: name() reverted.", [
+        market.underlyingAddress.toHex(),
+      ]);
+      market.underlyingName = "";
+    } else {
+      market.underlyingName = name.value;
+    }
 
-      if (symbol.reverted) {
-        log.info("*** CALL FAILED *** : ERC20: symbol() reverted.", [
-          market.underlyingAddress.toHex(),
-        ]);
-        market.underlyingSymbol = "";
-      } else {
-        market.underlyingSymbol = symbol.value;
-      }
+    if (symbol.reverted) {
+      log.info("*** CALL FAILED *** : ERC20: symbol() reverted.", [
+        market.underlyingAddress.toHex(),
+      ]);
+      market.underlyingSymbol = "";
+    } else {
+      market.underlyingSymbol = symbol.value;
     }
 
     if (marketAddress == rUSDCAddress) {
@@ -252,8 +247,11 @@ export function updateMarket(
     market.blockTimestamp = blockTimestamp;
     market.totalSupply = cTokenDecimalsBD.equals(zeroBD)
       ? zeroBD
-      : contract.totalSupply().toBigDecimal().div(exponentToBigDecimal(market.underlyingDecimals))
-      .truncate(market.underlyingDecimals);
+      : contract
+          .totalSupply()
+          .toBigDecimal()
+          .div(exponentToBigDecimal(market.underlyingDecimals))
+          .truncate(market.underlyingDecimals);
     market.liquidationThresholdUSD = market.totalSupply
       .times(market.underlyingPrice)
       .times(market.collateralFactor);
@@ -288,9 +286,7 @@ export function updateMarket(
         .div(mantissaFactorBD)
         .truncate(mantissaFactor);
 
-      market.supplyRate = contract
-      .supplyRatePerBlock()
-      .toBigDecimal()
+      market.supplyRate = contract.supplyRatePerBlock().toBigDecimal();
     }
 
     if (underlyingDecimals.equals(zeroBD)) {
@@ -303,7 +299,6 @@ export function updateMarket(
         .toBigDecimal()
         .div(exponentToBigDecimal(market.underlyingDecimals))
         .truncate(market.underlyingDecimals);
-
 
       market.totalBorrows = contract
         .totalBorrows()
@@ -328,9 +323,7 @@ export function updateMarket(
       if (mantissaFactorBD.equals(zeroBD)) {
         market.borrowRate = zeroBD;
       } else {
-        market.borrowRate = borrowRatePerBlock.value
-          .toBigDecimal()
-     
+        market.borrowRate = borrowRatePerBlock.value.toBigDecimal();
       }
     }
     market.save();
