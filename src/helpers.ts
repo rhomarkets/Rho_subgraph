@@ -3,7 +3,7 @@ import { Address, BigDecimal, Bytes } from "@graphprotocol/graph-ts/index";
 import { Account, AccountCToken } from "../generated/schema";
 
 export const comptrollerAddress = "0x8a67AB98A291d1AEA2E1eB0a79ae4ab7f2D76041"; //UNITROLLER
-export const priceOracle = "0x3E1AbD0731c9397f92beC0fbA6918628013F7C6F";
+export const priceOracle = "0x8966993138b95b48142f6ecB590427eb7e18a719";
 export const rUSDCAddress = "0xAE1846110F72f2DaaBC75B7cEEe96558289EDfc5";
 export const rETHAddress = "0x639355f34Ca9935E0004e30bD77b9cE2ADA0E692";
 
