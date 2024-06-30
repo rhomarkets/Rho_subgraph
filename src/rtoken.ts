@@ -20,6 +20,8 @@ import {
   zeroBD,
   priceOracle,
   comptrollerAddress,
+  replaceBlockNumber,
+  newPriceOracle,
 } from "./helpers";
 import { createMarket, updateMarket } from "./markets";
 import { PriceFeed } from "../generated/Comptroller/PriceFeed";
@@ -44,12 +46,17 @@ export function handleBorrow(event: Borrow): void {
     account = createAccount(accountID);
   }
 
-
   if (!market) {
     return;
   }
 
-  let oracleAddress = Address.fromString(priceOracle);
+  let oracleAddress: Address;
+  if (event.block.number.toI32() > replaceBlockNumber) {
+    oracleAddress = Address.fromString(newPriceOracle);
+  } else {
+    oracleAddress = Address.fromString(priceOracle);
+  }
+
   let oracle = PriceFeed.bind(oracleAddress);
   let usdPrice: BigDecimal;
 
@@ -162,7 +169,14 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   }
 
   let accountID = event.params.borrower.toHex();
-  let oracleAddress = Address.fromString(priceOracle);
+
+  let oracleAddress: Address;
+  if (event.block.number.toI32() > replaceBlockNumber) {
+    oracleAddress = Address.fromString(newPriceOracle);
+  } else {
+    oracleAddress = Address.fromString(priceOracle);
+  }
+
   let oracle = PriceFeed.bind(oracleAddress);
   let currentPrice = oracle.try_getPrice(event.address);
 
@@ -222,7 +236,10 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 
     account.totalBorrowValueInEth =
       account.totalBorrowValueInEth.minus(repayAmountDelta);
-      log.info(`*** DISPLAY *** : totalBorrowValueInEth after repay: ${account.totalBorrowValueInEth.toString()}`, []);
+    log.info(
+      `*** DISPLAY *** : totalBorrowValueInEth after repay: ${account.totalBorrowValueInEth.toString()}`,
+      []
+    );
   }
   let comptroller = Comptroller.bind(Address.fromString(comptrollerAddress));
   let accountLpInfo = comptroller.try_getAccountLiquidity(
@@ -262,7 +279,6 @@ export function handleRepayBorrow(event: RepayBorrow): void {
  *    add liquidation counts in this handler.
  */
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-
   // 加载或创建清算人账户
   let liquidatorID = event.params.liquidator.toHex();
   let liquidator = Account.load(liquidatorID);
@@ -300,8 +316,13 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
     market = createMarket(marketID);
   }
 
-  // 获取价格
-  let oracleAddress = Address.fromString(priceOracle);
+  let oracleAddress: Address;
+  if (event.block.number.toI32() > replaceBlockNumber) {
+    oracleAddress = Address.fromString(newPriceOracle);
+  } else {
+    oracleAddress = Address.fromString(priceOracle);
+  }
+
   let oracle = PriceFeed.bind(oracleAddress);
   let usdPrice: BigDecimal;
 
@@ -389,8 +410,14 @@ export function handleTransfer(event: Transfer): void {
   if (!market) {
     return;
   }
-  // 绑定价格预言机合约
-  let oracleAddress = Address.fromString(priceOracle);
+
+  let oracleAddress: Address;
+  if (event.block.number.toI32() > replaceBlockNumber) {
+    oracleAddress = Address.fromString(newPriceOracle);
+  } else {
+    oracleAddress = Address.fromString(priceOracle);
+  }
+
   let oracle = PriceFeed.bind(oracleAddress);
   let usdPrice: BigDecimal;
 
@@ -472,8 +499,6 @@ export function handleTransfer(event: Transfer): void {
       market.numberOfSuppliers = market.numberOfSuppliers - 1;
       market.save();
     }
-
-
   }
   // Checking if the tx is TO the cToken contract (i.e. this will not run when redeeming)
   // If so, we ignore it. this leaves an edge case, where someone who accidentally sends

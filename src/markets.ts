@@ -16,15 +16,15 @@ import {
   zeroBD,
   priceOracle,
   rUSDCAddress,
-  rETHAddress
+  rETHAddress,
+  replaceBlockNumber,
+  newPriceOracle,
 } from "./helpers";
 import { Comptroller, Market } from "../generated/schema";
 import { RToken } from "../generated/rSTONE/RToken";
 import { RERC20 } from "../generated/rSTONE/RERC20";
 import { ERC20 } from "../generated/rSTONE/ERC20";
 import { PriceFeed } from "../generated/Comptroller/PriceFeed";
-
-
 
 // Used for all cERC20 contracts
 function getTokenPrice(
@@ -37,7 +37,14 @@ function getTokenPrice(
 
   if (!comptroller) return BigDecimal.fromString("0");
 
-  let oracleAddress = Address.fromString(priceOracle);
+  let oracleAddress: Address;
+
+  if (blockNumber > replaceBlockNumber) {
+    oracleAddress = Address.fromString(newPriceOracle);
+  } else {
+    oracleAddress = Address.fromString(priceOracle);
+  }
+
   let oracle = PriceFeed.bind(oracleAddress);
   let usdPrice: BigDecimal;
 
@@ -99,7 +106,13 @@ function getUSDCpriceETH(blockNumber: i32): BigDecimal {
   let comptroller = Comptroller.load("1");
   if (!comptroller) return BigDecimal.zero();
 
-  let oracleAddress = Address.fromString(priceOracle);
+  let oracleAddress: Address;
+  if (blockNumber > replaceBlockNumber) {
+    oracleAddress = Address.fromString(newPriceOracle);
+  } else {
+    oracleAddress = Address.fromString(priceOracle);
+  }
+
   let oracle = PriceFeed.bind(oracleAddress);
   let usdPrice: BigDecimal;
 
@@ -248,8 +261,11 @@ export function updateMarket(
     market.blockTimestamp = blockTimestamp;
     market.totalSupply = cTokenDecimalsBD.equals(zeroBD)
       ? zeroBD
-      : contract.totalSupply().toBigDecimal().div(exponentToBigDecimal(market.underlyingDecimals))
-      .truncate(market.underlyingDecimals);
+      : contract
+          .totalSupply()
+          .toBigDecimal()
+          .div(exponentToBigDecimal(market.underlyingDecimals))
+          .truncate(market.underlyingDecimals);
     market.liquidationThresholdUSD = market.totalSupply
       .times(market.underlyingPrice)
       .times(market.collateralFactor);
@@ -284,9 +300,7 @@ export function updateMarket(
         .div(mantissaFactorBD)
         .truncate(mantissaFactor);
 
-      market.supplyRate = contract
-      .supplyRatePerBlock()
-      .toBigDecimal()
+      market.supplyRate = contract.supplyRatePerBlock().toBigDecimal();
     }
 
     if (underlyingDecimals.equals(zeroBD)) {
@@ -299,7 +313,6 @@ export function updateMarket(
         .toBigDecimal()
         .div(exponentToBigDecimal(market.underlyingDecimals))
         .truncate(market.underlyingDecimals);
-
 
       market.totalBorrows = contract
         .totalBorrows()
@@ -324,9 +337,7 @@ export function updateMarket(
       if (mantissaFactorBD.equals(zeroBD)) {
         market.borrowRate = zeroBD;
       } else {
-        market.borrowRate = borrowRatePerBlock.value
-          .toBigDecimal()
-     
+        market.borrowRate = borrowRatePerBlock.value.toBigDecimal();
       }
     }
     market.save();
