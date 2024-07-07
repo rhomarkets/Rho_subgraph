@@ -295,19 +295,6 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   }
   borrower.countLiquidated = borrower.countLiquidated + 1;
 
-  // 创建并保存 LiquidationEvent 实体
-  let liquidationEvent = new LiquidationBorrow(
-    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
-  );
-  liquidationEvent.liquidator = liquidatorID;
-  liquidationEvent.borrower = event.params.borrower;
-  liquidationEvent.repayAmount = event.params.repayAmount;
-  liquidationEvent.seizeTokens = event.params.seizeTokens;
-  liquidationEvent.rTokenCollateral = event.params.rTokenCollateral;
-  liquidationEvent.blockNumber = event.block.number;
-  liquidationEvent.blockTimestamp = event.block.timestamp;
-  liquidationEvent.transactionHash = event.transaction.hash;
-  liquidationEvent.save();
 
   // 加载或创建市场
   let marketID = event.params.rTokenCollateral.toHex();
@@ -315,6 +302,31 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   if (!market) {
     market = createMarket(marketID);
   }
+  let underlyingDecimals = exponentToBigDecimal(market.underlyingDecimals);
+
+  // 加载或创建市场
+  let repayMarketID = event.address.toHex();
+  let repayMarket = Market.load(repayMarketID);
+  if (!repayMarket) {
+    repayMarket = createMarket(repayMarketID);
+  }
+  let repayUnderlyingDecimals = exponentToBigDecimal(repayMarket.underlyingDecimals);
+
+  // 创建并保存 LiquidationEvent 实体
+  let liquidationEvent = new LiquidationBorrow(
+    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
+  );
+
+    liquidationEvent.liquidator = liquidatorID;
+    liquidationEvent.borrower = event.params.borrower.toHex();
+    liquidationEvent.repayAmount = event.params.repayAmount.toBigDecimal().div(repayUnderlyingDecimals);
+    liquidationEvent.seizeTokens = event.params.seizeTokens.toBigDecimal().div(underlyingDecimals);
+    liquidationEvent.rTokenCollateral = event.params.rTokenCollateral.toHex();
+    liquidationEvent.blockNumber = event.block.number.toI32();
+    liquidationEvent.blockTimestamp = event.block.timestamp.toI32();
+    liquidationEvent.transactionHash = event.transaction.hash.toHex();
+    liquidationEvent.address =  event.address.toHex();
+    liquidationEvent.save();
 
   let oracleAddress: Address;
   if (event.block.number.toI32() > replaceBlockNumber) {
@@ -335,8 +347,6 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   } else {
     usdPrice = currentPrice.value.toBigDecimal();
   }
-  // 获取cToken的精度
-  let underlyingDecimals = exponentToBigDecimal(market.underlyingDecimals);
   // 调整usdPrice的精度
   usdPrice = usdPrice.div(mantissaFactorBD);
 

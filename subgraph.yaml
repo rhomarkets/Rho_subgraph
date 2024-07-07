@@ -341,6 +341,48 @@ dataSources:
           handler: handleNewMarketInterestRateModel
       file: ./src/rtoken.ts
   - kind: ethereum
+    name: rUSDe
+    network: scroll
+    source:
+      address: "0x5fF1926507f6e71bFbd5f9897fBaeF021E2F77CA"
+      abi: RToken
+      startBlock: 6460000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - User
+        - Market
+        - RTokenInfo
+      abis:
+        - name: RToken
+          file: ./abis/rtoken.json
+        - name: Comptroller
+          file: ./abis/comptroller.json
+        - name: PriceFeed
+          file: ./abis/PriceFeed.json
+        - name: ERC20
+          file: ./abis/erc20.json
+        - name: RERC20
+          file: ./abis/rerc20.json
+      eventHandlers:
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+        - event: AccrueInterest(uint256,uint256,uint256,uint256)
+          handler: handleAccrueInterest
+        - event: NewReserveFactor(uint256,uint256)
+          handler: handleNewReserveFactor
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: NewMarketInterestRateModel(address,address)
+          handler: handleNewMarketInterestRateModel
+      file: ./src/rtoken.ts
+  - kind: ethereum
     name: Comptroller
     network: scroll
     source:
