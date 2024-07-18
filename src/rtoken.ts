@@ -592,6 +592,14 @@ export function handleTransfer(event: Transfer): void {
   }
 }
 
+export function handleAccrueInterest(event: AccrueInterest): void {
+  updateMarket(
+    event.address,
+    event.block.number.toI32(),
+    event.block.timestamp.toI32()
+  );
+}
+
 export function handleNewReserveFactor(event: NewReserveFactor): void {
   let marketID = event.address.toHex();
   let market = Market.load(marketID);
