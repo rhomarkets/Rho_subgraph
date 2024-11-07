@@ -52,7 +52,7 @@ dataSources:
     source:
       address: "0xAD3d07d431B85B525D81372802504Fa18DBd554c"
       abi: RToken
-      startBlock: 6430000 
+      startBlock: 6430000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -94,7 +94,7 @@ dataSources:
     source:
       address: "0xAE1846110F72f2DaaBC75B7cEEe96558289EDfc5"
       abi: RToken
-      startBlock: 6430000 
+      startBlock: 6430000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -136,7 +136,7 @@ dataSources:
     source:
       address: "0x855CEA8626Fa7b42c13e7A688b179bf61e6c1e81"
       abi: RToken
-      startBlock: 6430000 
+      startBlock: 6430000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -178,7 +178,7 @@ dataSources:
     source:
       address: "0xe4FC4C444efFB5ECa80274c021f652980794Eae6"
       abi: RToken
-      startBlock: 6430000 
+      startBlock: 6430000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -220,7 +220,7 @@ dataSources:
     source:
       address: "0x8966993138b95b48142f6ecB590427eb7e18a719"
       abi: RToken
-      startBlock: 6430000 
+      startBlock: 6430000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -262,7 +262,7 @@ dataSources:
     source:
       address: "0x65a5dBEf0D1Bff772822E4652Aed2829718DC43F"
       abi: RToken
-      startBlock: 6430000 
+      startBlock: 6430000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -383,12 +383,138 @@ dataSources:
           handler: handleNewMarketInterestRateModel
       file: ./src/rtoken.ts
   - kind: ethereum
+    name: rylstETH
+    network: scroll
+    source:
+      address: "0x7AE3c19De353ce163Fe81AE3ebFC90709d3868BE"
+      abi: RToken
+      startBlock: 9794309
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - User
+        - Market
+        - RTokenInfo
+      abis:
+        - name: RToken
+          file: ./abis/rtoken.json
+        - name: Comptroller
+          file: ./abis/comptroller.json
+        - name: PriceFeed
+          file: ./abis/PriceFeed.json
+        - name: ERC20
+          file: ./abis/erc20.json
+        - name: RERC20
+          file: ./abis/rerc20.json
+      eventHandlers:
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+        - event: AccrueInterest(uint256,uint256,uint256,uint256)
+          handler: handleAccrueInterest
+        - event: NewReserveFactor(uint256,uint256)
+          handler: handleNewReserveFactor
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: NewMarketInterestRateModel(address,address)
+          handler: handleNewMarketInterestRateModel
+      file: ./src/rtoken.ts
+  - kind: ethereum
+    name: runiETH
+    network: scroll
+    source:
+      address: "0xFE707359517f0d5AD0187a237974D3110A734016"
+      abi: RToken
+      startBlock: 8749915
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - User
+        - Market
+        - RTokenInfo
+      abis:
+        - name: RToken
+          file: ./abis/rtoken.json
+        - name: Comptroller
+          file: ./abis/comptroller.json
+        - name: PriceFeed
+          file: ./abis/PriceFeed.json
+        - name: ERC20
+          file: ./abis/erc20.json
+        - name: RERC20
+          file: ./abis/rerc20.json
+      eventHandlers:
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+        - event: AccrueInterest(uint256,uint256,uint256,uint256)
+          handler: handleAccrueInterest
+        - event: NewReserveFactor(uint256,uint256)
+          handler: handleNewReserveFactor
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: NewMarketInterestRateModel(address,address)
+          handler: handleNewMarketInterestRateModel
+      file: ./src/rtoken.ts
+  - kind: ethereum
+    name: rSCR
+    network: scroll
+    source:
+      address: "0xC34721FE52284FAB7AEC852A48CB45108F8b4aCa"
+      abi: RToken
+      startBlock: 10618426
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - User
+        - Market
+        - RTokenInfo
+      abis:
+        - name: RToken
+          file: ./abis/rtoken.json
+        - name: Comptroller
+          file: ./abis/comptroller.json
+        - name: PriceFeed
+          file: ./abis/PriceFeed.json
+        - name: ERC20
+          file: ./abis/erc20.json
+        - name: RERC20
+          file: ./abis/rerc20.json
+      eventHandlers:
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+        - event: AccrueInterest(uint256,uint256,uint256,uint256)
+          handler: handleAccrueInterest
+        - event: NewReserveFactor(uint256,uint256)
+          handler: handleNewReserveFactor
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: NewMarketInterestRateModel(address,address)
+          handler: handleNewMarketInterestRateModel
+      file: ./src/rtoken.ts
+  - kind: ethereum
     name: Comptroller
     network: scroll
     source:
       address: "0x8a67AB98A291d1AEA2E1eB0a79ae4ab7f2D76041"
       abi: Comptroller
-      startBlock: 6430000 
+      startBlock: 6430000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

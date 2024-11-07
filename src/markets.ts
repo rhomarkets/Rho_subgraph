@@ -60,44 +60,6 @@ function getTokenPrice(
   }
 
   usdPrice = usdPrice.div(mantissaFactorBD);
-  /* PriceOracle2 is used at the block the Comptroller starts using it.
-   * see here https://etherscan.io/address/0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b#events
-   * Search for event topic 0xd52b2b9b7e9ee655fcb95d2e5b9e0c9f69e7ef2b8e9d2d0ea78402d576d22e22,
-   * and see block 7715908.
-   *
-   * This must use the cToken address.
-   *
-   * Note this returns the value without factoring in token decimals and wei, so we must divide
-   * the number by (ethDecimals - tokenDecimals) and again by the mantissa.
-   * USDC would be 10 ^ ((18 - 6) + 18) = 10 ^ 30
-   *
-   * Note that they deployed 3 different PriceOracles at the beginning of the Comptroller,
-   * and that they handle the decimals different, which can break the subgraph. So we actually
-   * defer to Oracle 1 before block 7715908, which works,
-   * until this one is deployed, which was used for 121 days */
-
-  // let mantissaDecimalFactor = 18 - underlyingDecimals;
-  // let bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
-  // let currentUnderlyingPrice = oracle.try_getPrice(eventAddress);
-
-  // if (currentUnderlyingPrice.reverted || bdFactor.equals(zeroBD)) {
-  //   log.info("*** CALL FAILED *** : ERC20: getUnderlyingPrice() reverted.", [
-  //     oracleAddress.toHex(),
-  //   ]);
-  //   underlyingPrice = zeroBD;
-  // } else {
-  //   underlyingPrice = currentUnderlyingPrice.value.toBigDecimal();
-  // }
-
-  /* PriceOracle(1) is used (only for the first ~100 blocks of Comptroller. Annoying but we must
-   * handle this. We use it for more than 100 blocks, see reason at top of if statement
-   * of PriceOracle2.
-   *
-   * This must use the token address, not the cToken address.
-   *
-   * Note this returns the value already factoring in token decimals and wei, therefore
-   * we only need to divide by the mantissa, 10^18 */
-
   return usdPrice;
 }
 
@@ -308,11 +270,18 @@ export function updateMarket(
       market.totalBorrows = zeroBD;
       market.cash = zeroBD;
     } else {
-      market.reserves = contract
-        .totalReserves()
-        .toBigDecimal()
-        .div(exponentToBigDecimal(market.underlyingDecimals))
-        .truncate(market.underlyingDecimals);
+      const totalReserves = contract.try_totalReserves();
+      if (totalReserves.reverted) {
+        log.info("*** CALL FAILED *** : RERC20: totalReserves() reverted.", [
+          market.underlyingAddress.toHex(),
+        ]);
+        market.reserves = zeroBD;
+      } else {
+        market.reserves = totalReserves.value
+          .toBigDecimal()
+          .div(exponentToBigDecimal(market.underlyingDecimals))
+          .truncate(market.underlyingDecimals);
+      }
 
       market.totalBorrows = contract
         .totalBorrows()

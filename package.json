@@ -8,6 +8,9 @@
     "create-local": "graph create --node http://localhost:8020/ rho-markets-mainnet",
     "remove-local": "graph remove --node http://localhost:8020/ rho-markets-mainnet",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 rho-markets-mainnet",
+    "create-aws": "graph create --node http://ec2-44-220-142-254.compute-1.amazonaws.com:8020/ rho-markets-mainnet",
+    "remove-aws": "graph remove --node http://ec2-44-220-142-254.compute-1.amazonaws.com:8020/ rho-markets-mainnet",
+    "deploy-aws": "graph deploy --node http://ec2-44-220-142-254.compute-1.amazonaws.com:8020/ --ipfs http://ec2-44-220-142-254.compute-1.amazonaws.com:5001 rho-markets-mainnet",
     "test": "graph test"
   },
   "dependencies": {
