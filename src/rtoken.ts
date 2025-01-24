@@ -295,7 +295,6 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   }
   borrower.countLiquidated = borrower.countLiquidated + 1;
 
-
   // 加载或创建市场
   let marketID = event.params.rTokenCollateral.toHex();
   let market = Market.load(marketID);
@@ -310,23 +309,29 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   if (!repayMarket) {
     repayMarket = createMarket(repayMarketID);
   }
-  let repayUnderlyingDecimals = exponentToBigDecimal(repayMarket.underlyingDecimals);
+  let repayUnderlyingDecimals = exponentToBigDecimal(
+    repayMarket.underlyingDecimals
+  );
 
   // 创建并保存 LiquidationEvent 实体
   let liquidationEvent = new LiquidationBorrow(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
 
-    liquidationEvent.liquidator = liquidatorID;
-    liquidationEvent.borrower = event.params.borrower.toHex();
-    liquidationEvent.repayAmount = event.params.repayAmount.toBigDecimal().div(repayUnderlyingDecimals);
-    liquidationEvent.seizeTokens = event.params.seizeTokens.toBigDecimal().div(underlyingDecimals);
-    liquidationEvent.rTokenCollateral = event.params.rTokenCollateral.toHex();
-    liquidationEvent.blockNumber = event.block.number.toI32();
-    liquidationEvent.blockTimestamp = event.block.timestamp.toI32();
-    liquidationEvent.transactionHash = event.transaction.hash.toHex();
-    liquidationEvent.address =  event.address.toHex();
-    liquidationEvent.save();
+  liquidationEvent.liquidator = liquidatorID;
+  liquidationEvent.borrower = event.params.borrower.toHex();
+  liquidationEvent.repayAmount = event.params.repayAmount
+    .toBigDecimal()
+    .div(repayUnderlyingDecimals);
+  liquidationEvent.seizeTokens = event.params.seizeTokens
+    .toBigDecimal()
+    .div(underlyingDecimals);
+  liquidationEvent.rTokenCollateral = event.params.rTokenCollateral.toHex();
+  liquidationEvent.blockNumber = event.block.number.toI32();
+  liquidationEvent.blockTimestamp = event.block.timestamp.toI32();
+  liquidationEvent.transactionHash = event.transaction.hash.toHex();
+  liquidationEvent.address = event.address.toHex();
+  liquidationEvent.save();
 
   let oracleAddress: Address;
   if (event.block.number.toI32() > replaceBlockNumber) {
@@ -566,6 +571,10 @@ export function handleTransfer(event: Transfer): void {
 
       accountTo.totalCollateralValueInEth =
         accountTo.totalCollateralValueInEth.plus(cTokenBalanceDelta);
+
+      if (accountTo.totalCollateralValueInEth < zeroBD) {
+        accountTo.totalCollateralValueInEth = zeroBD;
+      }
 
       log.info(
         `*** SUPPLY CALCULATION *** : AmountIn ${event.params.amount} totalCollateralValueInEth: cTokenBalanceDelta ${cTokenBalanceDelta} cTokenBalance ${cTokenStatsTo.cTokenBalance}, usdPrice ${usdPrice}, cTokenDecimalsBD ${cTokenDecimalsBD}, exchangeRate ${market.exchangeRate}`,

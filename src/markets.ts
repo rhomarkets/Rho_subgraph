@@ -7,24 +7,24 @@ import {
   BigInt,
   log,
 } from "@graphprotocol/graph-ts/index";
-
+import { Comptroller, Market } from "../generated/schema";
 import {
+  cTokenDecimalsBD,
   exponentToBigDecimal,
   mantissaFactor,
   mantissaFactorBD,
-  cTokenDecimalsBD,
-  zeroBD,
-  priceOracle,
-  rUSDCAddress,
-  rETHAddress,
-  replaceBlockNumber,
   newPriceOracle,
+  priceOracle,
+  rETHAddress,
+  rUSDCAddress,
+  replaceBlockNumber,
+  zeroBD,
 } from "./helpers";
-import { Comptroller, Market } from "../generated/schema";
-import { RToken } from "../generated/rSTONE/RToken";
-import { RERC20 } from "../generated/rSTONE/RERC20";
+
 import { ERC20 } from "../generated/rSTONE/ERC20";
 import { PriceFeed } from "../generated/Comptroller/PriceFeed";
+import { RERC20 } from "../generated/rSTONE/RERC20";
+import { RToken } from "../generated/rSTONE/RToken";
 
 // Used for all cERC20 contracts
 function getTokenPrice(
@@ -221,13 +221,24 @@ export function updateMarket(
 
     market.accrualBlockNumber = contract.accrualBlockNumber().toI32();
     market.blockTimestamp = blockTimestamp;
-    market.totalSupply = cTokenDecimalsBD.equals(zeroBD)
-      ? zeroBD
-      : contract
-          .totalSupply()
+
+    if (cTokenDecimalsBD.equals(zeroBD)) {
+      market.totalSupply = zeroBD;
+    } else {
+      const totalSupply = contract.try_totalSupply();
+      if (totalSupply.reverted) {
+        log.info("*** CALL FAILED *** : totalSupply() reverted.", [
+          market.id.toString(),
+        ]);
+        market.totalSupply = zeroBD;
+      } else {
+        market.totalSupply = totalSupply.value
           .toBigDecimal()
           .div(exponentToBigDecimal(market.underlyingDecimals))
           .truncate(market.underlyingDecimals);
+      }
+    }
+
     market.liquidationThresholdUSD = market.totalSupply
       .times(market.underlyingPrice)
       .times(market.collateralFactor);
@@ -256,13 +267,29 @@ export function updateMarket(
       market.borrowIndex = zeroBD;
       market.supplyRate = zeroBD;
     } else {
-      market.borrowIndex = contract
-        .borrowIndex()
-        .toBigDecimal()
-        .div(mantissaFactorBD)
-        .truncate(mantissaFactor);
+      const borrowIndex = contract.try_borrowIndex();
+      if (borrowIndex.reverted) {
+        log.info("*** CALL FAILED *** : RERC20: borrowIndex() reverted.", [
+          market.underlyingAddress.toHex(),
+        ]);
+        market.borrowIndex = zeroBD;
+      } else {
+        market.borrowIndex = borrowIndex.value
+          .toBigDecimal()
+          .div(mantissaFactorBD)
+          .truncate(mantissaFactor);
+      }
 
-      market.supplyRate = contract.supplyRatePerBlock().toBigDecimal();
+      const supplyRatePerBlock = contract.try_supplyRatePerBlock();
+      if (supplyRatePerBlock.reverted) {
+        log.info(
+          "*** CALL FAILED *** : RERC20: supplyRatePerBlock() reverted.",
+          [market.underlyingAddress.toHex()]
+        );
+        market.supplyRate = zeroBD;
+      } else {
+        market.supplyRate = supplyRatePerBlock.value.toBigDecimal();
+      }
     }
 
     if (underlyingDecimals.equals(zeroBD)) {
@@ -283,17 +310,33 @@ export function updateMarket(
           .truncate(market.underlyingDecimals);
       }
 
-      market.totalBorrows = contract
-        .totalBorrows()
-        .toBigDecimal()
-        .div(exponentToBigDecimal(market.underlyingDecimals))
-        .truncate(market.underlyingDecimals);
+      const totalBorrows = contract.try_totalBorrows();
 
-      market.cash = contract
-        .getCash()
-        .toBigDecimal()
-        .div(exponentToBigDecimal(market.underlyingDecimals))
-        .truncate(market.underlyingDecimals);
+      if (totalBorrows.reverted) {
+        log.info("*** CALL FAILED *** : RERC20: totalBorrows() reverted.", [
+          market.underlyingAddress.toHex(),
+        ]);
+        market.totalBorrows = zeroBD;
+      } else {
+        market.totalBorrows = totalBorrows.value
+          .toBigDecimal()
+          .div(exponentToBigDecimal(market.underlyingDecimals))
+          .truncate(market.underlyingDecimals);
+      }
+
+      const cash = contract.try_getCash();
+
+      if (cash.reverted) {
+        log.info("*** CALL FAILED *** : RERC20: getCash() reverted.", [
+          market.underlyingAddress.toHex(),
+        ]);
+        market.cash = zeroBD;
+      } else {
+        market.cash = cash.value
+          .toBigDecimal()
+          .div(exponentToBigDecimal(market.underlyingDecimals))
+          .truncate(market.underlyingDecimals);
+      }
     }
 
     // This fails on only the first call to cZRX. It is unclear why, but otherwise it works.
