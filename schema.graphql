@@ -5,7 +5,7 @@ type LiquidationBorrow @entity {
   repayAmount: BigDecimal!
   address: String!
   seizeTokens: BigDecimal!
-  rTokenCollateral: String!
+  tTokenCollateral: String!
   blockNumber: Int!
   blockTimestamp: Int!
   transactionHash: String!

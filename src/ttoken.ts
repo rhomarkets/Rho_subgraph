@@ -7,25 +7,24 @@ import {
   NewReserveFactor,
   RepayBorrow,
   Transfer,
-} from "../generated/rSTONE/RToken";
+} from "../generated/tUSDC/TToken";
 
-import { Account, Market, LiquidationBorrow } from "../generated/schema";
+import { Comptroller } from "../generated/Comptroller/Comptroller";
+import { PriceFeed } from "../generated/Comptroller/PriceFeed";
+import { Account, LiquidationBorrow, Market } from "../generated/schema";
 import {
-  cTokenDecimals,
   cTokenDecimalsBD,
+  comptrollerAddress,
   createAccount,
   exponentToBigDecimal,
   mantissaFactorBD,
+  newPriceOracle,
+  priceOracle,
+  replaceBlockNumber,
   updateCommonCTokenStats,
   zeroBD,
-  priceOracle,
-  comptrollerAddress,
-  replaceBlockNumber,
-  newPriceOracle,
 } from "./helpers";
 import { createMarket, updateMarket } from "./markets";
-import { PriceFeed } from "../generated/Comptroller/PriceFeed";
-import { Comptroller } from "../generated/Comptroller/Comptroller";
 
 /* Borrow assets from the protocol. All values either ETH or ERC20
  *
@@ -296,7 +295,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   borrower.countLiquidated = borrower.countLiquidated + 1;
 
   // 加载或创建市场
-  let marketID = event.params.rTokenCollateral.toHex();
+  let marketID = event.params.tTokenCollateral.toHex();
   let market = Market.load(marketID);
   if (!market) {
     market = createMarket(marketID);
@@ -326,7 +325,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   liquidationEvent.seizeTokens = event.params.seizeTokens
     .toBigDecimal()
     .div(underlyingDecimals);
-  liquidationEvent.rTokenCollateral = event.params.rTokenCollateral.toHex();
+  liquidationEvent.tTokenCollateral = event.params.tTokenCollateral.toHex();
   liquidationEvent.blockNumber = event.block.number.toI32();
   liquidationEvent.blockTimestamp = event.block.timestamp.toI32();
   liquidationEvent.transactionHash = event.transaction.hash.toHex();
@@ -343,7 +342,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let oracle = PriceFeed.bind(oracleAddress);
   let usdPrice: BigDecimal;
 
-  let currentPrice = oracle.try_getPrice(event.params.rTokenCollateral);
+  let currentPrice = oracle.try_getPrice(event.params.tTokenCollateral);
   if (currentPrice.reverted) {
     log.info("*** CALL FAILED *** : ERC20: getPrice() reverted.", [
       oracleAddress.toHex(),

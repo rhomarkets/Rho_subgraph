@@ -626,7 +626,7 @@
         "internalType": "address"
       },
       {
-        "name": "rTokenCollateral",
+        "name": "tTokenCollateral",
         "type": "address",
         "internalType": "contract RToken"
       }
@@ -644,7 +644,7 @@
         "internalType": "address"
       },
       {
-        "name": "rTokenCollateral",
+        "name": "tTokenCollateral",
         "type": "address",
         "internalType": "contract RTokenInterface"
       },
@@ -1211,7 +1211,7 @@
         "internalType": "uint256"
       },
       {
-        "name": "rTokenCollateral",
+        "name": "tTokenCollateral",
         "type": "address",
         "indexed": false,
         "internalType": "address"

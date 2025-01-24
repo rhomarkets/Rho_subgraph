@@ -21,10 +21,10 @@ import {
   zeroBD,
 } from "./helpers";
 
-import { ERC20 } from "../generated/rSTONE/ERC20";
 import { PriceFeed } from "../generated/Comptroller/PriceFeed";
-import { RERC20 } from "../generated/rSTONE/RERC20";
-import { RToken } from "../generated/rSTONE/RToken";
+import { ERC20 } from "../generated/tUSDT/ERC20";
+import { RERC20 } from "../generated/tUSDT/RERC20";
+import { TToken } from "../generated/tUSDT/TToken";
 
 // Used for all cERC20 contracts
 function getTokenPrice(
@@ -189,7 +189,7 @@ export function updateMarket(
   // Only updateMarket if it has not been updated this block
   if (market.accrualBlockNumber != blockNumber) {
     let contractAddress = Address.fromString(market.id);
-    let contract = RToken.bind(contractAddress);
+    let contract = TToken.bind(contractAddress);
     let usdPriceInEth = getUSDCpriceETH(blockNumber);
 
     // if cETH, we only update USD price

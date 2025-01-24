@@ -361,7 +361,7 @@
       { "name": "borrower", "type": "address", "internalType": "address" },
       { "name": "repayAmount", "type": "uint256", "internalType": "uint256" },
       {
-        "name": "rTokenCollateral",
+        "name": "tTokenCollateral",
         "type": "address",
         "internalType": "contract RTokenInterface"
       },
@@ -378,7 +378,7 @@
       { "name": "borrower", "type": "address", "internalType": "address" },
       { "name": "repayAmount", "type": "uint256", "internalType": "uint256" },
       {
-        "name": "rTokenCollateral",
+        "name": "tTokenCollateral",
         "type": "address",
         "internalType": "contract RTokenInterface"
       }
@@ -768,7 +768,7 @@
         "internalType": "uint256"
       },
       {
-        "name": "rTokenCollateral",
+        "name": "tTokenCollateral",
         "type": "address",
         "indexed": false,
         "internalType": "address"

@@ -479,7 +479,7 @@
         "internalType": "address"
       },
       {
-        "name": "rTokenCollateral",
+        "name": "tTokenCollateral",
         "type": "address",
         "internalType": "address"
       },
@@ -500,7 +500,7 @@
         "internalType": "address"
       },
       {
-        "name": "rTokenCollateral",
+        "name": "tTokenCollateral",
         "type": "address",
         "internalType": "address"
       },
@@ -646,7 +646,7 @@
     "name": "seizeAllowed",
     "inputs": [
       {
-        "name": "rTokenCollateral",
+        "name": "tTokenCollateral",
         "type": "address",
         "internalType": "address"
       },

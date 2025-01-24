@@ -857,7 +857,7 @@
         "internalType": "uint256"
       },
       {
-        "name": "rTokenCollateral",
+        "name": "tTokenCollateral",
         "type": "address",
         "indexed": false,
         "internalType": "address"
