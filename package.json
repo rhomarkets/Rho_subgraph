@@ -1,14 +1,14 @@
 {
-  "name": "takara-lend",
+  "name": "takara",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --studio takara-lend",
-    "create-local": "graph create --node http://localhost:8020/ takara-lend",
-    "remove-local": "graph remove --node http://localhost:8020/ takara-lend",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 takara-lend",
-    "create-aws": "graph create --node http://ec2-44-220-142-254.compute-1.amazonaws.com:8020/ takara-lend",
+    "deploy": "graph deploy --studio takara",
+    "create-local": "graph create --node http://localhost:8020/ takara",
+    "remove-local": "graph remove --node http://localhost:8020/ takara",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 takara",
+    "create-aws": "graph create --node http://ec2-44-220-142-254.compute-1.amazonaws.com:8020/ takara",
     "test": "graph test"
   },
   "dependencies": {

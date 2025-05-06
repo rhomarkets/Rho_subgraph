@@ -2,12 +2,9 @@
 import { Address, BigDecimal, Bytes } from "@graphprotocol/graph-ts/index";
 import { Account, AccountCToken } from "../generated/schema";
 
-export const comptrollerAddress = "0x8a67AB98A291d1AEA2E1eB0a79ae4ab7f2D76041"; //UNITROLLER
-export const priceOracle = "0x3E1AbD0731c9397f92beC0fbA6918628013F7C6F";
-export const newPriceOracle = "0x653C2D3A1E4Ac5330De3c9927bb9BDC51008f9d5";
-export const rUSDCAddress = "0xAE1846110F72f2DaaBC75B7cEEe96558289EDfc5";
-export const rETHAddress = "0x639355f34Ca9935E0004e30bD77b9cE2ADA0E692";
-export const replaceBlockNumber = 6812594;
+export const comptrollerAddress = "0x71034bf5eC0FAd7aEE81a213403c8892F3d8CAeE"; //UNITROLLER
+export const priceOracle = "0xD6a275072dceC8a319c0C7178951A0CF9DCC0447";
+export const rUSDCAddress = "0xC3c9e322F4aAe352ace79D0E62ADe3563fB86e87";
 
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
   let bd = BigDecimal.fromString("1");
@@ -35,7 +32,7 @@ export function createAccountCToken(
   cTokenStats.account = account;
   cTokenStats.transactionHashes = [];
   cTokenStats.transactionTimes = [];
-  cTokenStats.accrualBlockNumber = 0;
+  cTokenStats.accrualBlockTimestamp = 0;
   cTokenStats.cTokenBalance = zeroBD;
   cTokenStats.cTokenBalanceUSD = zeroBD;
   cTokenStats.totalUnderlyingSupplied = zeroBD;
@@ -86,6 +83,6 @@ export function updateCommonCTokenStats(
   let txTimes = cTokenStats.transactionTimes;
   txTimes.push(timestamp);
   cTokenStats.transactionTimes = txTimes;
-  cTokenStats.accrualBlockNumber = blockNumber;
+  cTokenStats.accrualBlockTimestamp = blockNumber;
   return cTokenStats as AccountCToken;
 }

@@ -66,7 +66,7 @@ type Market
 
   # Fields that are not in compounds api
   "Block the market is updated to"
-  accrualBlockNumber: Int!
+  accrualBlockTimestamp: Int!
   "Timestamp the market was most recently updated"
   blockTimestamp: Int!
   "The history of the markets borrow index return (Think S&P 500)"
@@ -124,7 +124,7 @@ type AccountCToken @entity {
   "Times of all user transactions"
   transactionTimes: [Int!]!
   "Block number this asset was updated at in the contract"
-  accrualBlockNumber: Int!
+  accrualBlockTimestamp: Int!
   "True if user is entered, false if they are exited"
   enteredMarket: Boolean!
 
@@ -142,7 +142,7 @@ type AccountCToken @entity {
   totalUnderlyingBorrowed: BigDecimal!
   "Total amount underlying repaid"
   totalUnderlyingRepaid: BigDecimal!
-  "Current borrow balance stored in contract (exclusive of interest since accrualBlockNumber)"
+  "Current borrow balance stored in contract (exclusive of interest since accrualBlockTimestamp)"
   storedBorrowBalance: BigDecimal!
   storedBorrowBalanceUSD: BigDecimal!
 

@@ -18,9 +18,7 @@ import {
   createAccount,
   exponentToBigDecimal,
   mantissaFactorBD,
-  newPriceOracle,
   priceOracle,
-  replaceBlockNumber,
   updateCommonCTokenStats,
   zeroBD,
 } from "./helpers";
@@ -49,12 +47,7 @@ export function handleBorrow(event: Borrow): void {
     return;
   }
 
-  let oracleAddress: Address;
-  if (event.block.number.toI32() > replaceBlockNumber) {
-    oracleAddress = Address.fromString(newPriceOracle);
-  } else {
-    oracleAddress = Address.fromString(priceOracle);
-  }
+  let oracleAddress = Address.fromString(priceOracle);
 
   let oracle = PriceFeed.bind(oracleAddress);
   let usdPrice: BigDecimal;
@@ -169,12 +162,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 
   let accountID = event.params.borrower.toHex();
 
-  let oracleAddress: Address;
-  if (event.block.number.toI32() > replaceBlockNumber) {
-    oracleAddress = Address.fromString(newPriceOracle);
-  } else {
-    oracleAddress = Address.fromString(priceOracle);
-  }
+  let oracleAddress = Address.fromString(priceOracle);
 
   let oracle = PriceFeed.bind(oracleAddress);
   let currentPrice = oracle.try_getPrice(event.address);
@@ -333,11 +321,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   liquidationEvent.save();
 
   let oracleAddress: Address;
-  if (event.block.number.toI32() > replaceBlockNumber) {
-    oracleAddress = Address.fromString(newPriceOracle);
-  } else {
-    oracleAddress = Address.fromString(priceOracle);
-  }
+  oracleAddress = Address.fromString(priceOracle);
 
   let oracle = PriceFeed.bind(oracleAddress);
   let usdPrice: BigDecimal;
@@ -425,12 +409,7 @@ export function handleTransfer(event: Transfer): void {
     return;
   }
 
-  let oracleAddress: Address;
-  if (event.block.number.toI32() > replaceBlockNumber) {
-    oracleAddress = Address.fromString(newPriceOracle);
-  } else {
-    oracleAddress = Address.fromString(priceOracle);
-  }
+  let oracleAddress = Address.fromString(priceOracle);
 
   let oracle = PriceFeed.bind(oracleAddress);
   let usdPrice: BigDecimal;
@@ -444,7 +423,7 @@ export function handleTransfer(event: Transfer): void {
   }
 
   // 如果市场的accrualBlockNumber与当前区块不同，则更新市场
-  if (market.accrualBlockNumber != event.block.number.toI32()) {
+  if (market.accrualBlockTimestamp != event.block.number.toI32()) {
     market = updateMarket(
       event.address,
       event.block.number.toI32(),

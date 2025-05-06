@@ -166,7 +166,7 @@
   },
   {
     "type": "function",
-    "name": "accrualBlockNumber",
+    "name": "accrualBlockTimestamp",
     "inputs": [],
     "outputs": [
       {
