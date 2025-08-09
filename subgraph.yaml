@@ -5,56 +5,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: tUSDC
-    network: sei-mainnet
-    source:
-      address: "0xC3c9e322F4aAe352ace79D0E62ADe3563fB86e87"
-      abi: TToken
-      startBlock: 131220082
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - Account
-        - AccountCToken
-        - LiquidationBorrow
-        - Market
-      abis:
-        - name: TToken
-          file: ./abis/ttoken.json
-        - name: Comptroller
-          file: ./abis/comptroller.json
-        - name: PriceFeed
-          file: ./abis/PriceFeed.json
-        - name: ERC20
-          file: ./abis/erc20.json
-        - name: RERC20
-          file: ./abis/rerc20.json
-      eventHandlers:
-        - event: Borrow(address,uint256,uint256,uint256)
-          handler: handleBorrow
-        - event: RepayBorrow(address,address,uint256,uint256,uint256)
-          handler: handleRepayBorrow
-        - event: LiquidateBorrow(address,address,uint256,address,uint256)
-          handler: handleLiquidateBorrow
-        - event: AccrueInterest(uint256,uint256,uint256,uint256)
-          handler: handleAccrueInterest
-        - event: NewReserveFactor(uint256,uint256)
-          handler: handleNewReserveFactor
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: NewMarketInterestRateModel(address,address)
-          handler: handleNewMarketInterestRateModel
-      file: ./src/ttoken.ts
- 
-  - kind: ethereum
     name: tUSDT
     network: sei-mainnet
     source:
-      address: "0xc68351B9B3638A6f4A3Ae100Bd251e227BbD7479"
+      address: "0x07C167f4a58048e0464DF53c093697A25a2f9cCd"
       abi: TToken
-      startBlock: 131220082
+      startBlock: 131201452
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -95,9 +51,9 @@ dataSources:
     name: tSEI
     network: sei-mainnet
     source:
-      address: "0xA26b9BFe606d29F16B5Aecf30F9233934452c4E2"
+      address: "0x30eFcD1d46f00ec0797431B559D28C7f613f9805"
       abi: TToken
-      startBlock: 131220083
+      startBlock: 131201453
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -138,9 +94,9 @@ dataSources:
     name: tfastUSD
     network: sei-mainnet
     source:
-      address: "0x92e51466482146E71b692ced2265284968E8B3d6"
+      address: "0xE7aB69F4D32c2667691D492381f7816E7b59E52D"
       abi: TToken
-      startBlock: 131220083
+      startBlock: 131201454
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -181,9 +137,9 @@ dataSources:
     name: tiSEI
     network: sei-mainnet
     source:
-      address: "0xda642A7821E91eD285262fead162E5fd17200429"
+      address: "0x98a7d886b4F7AA0E4b321e465A4699EE04AbE162"
       abi: TToken
-      startBlock: 131220084
+      startBlock: 131201455
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -224,9 +180,9 @@ dataSources:
     name: tuBTC
     network: sei-mainnet
     source:
-      address: "0xabFb7A392a6DaaC50f99c5D14B5f27EFfd08Fe03"
+      address: "0xdFbc611D5A713b596b6aeDf096488DF781723198"
       abi: TToken
-      startBlock: 136961891
+      startBlock: 136908036
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -267,9 +223,9 @@ dataSources:
     name: tUSDT0
     network: sei-mainnet
     source:
-      address: "0xA82a40324DBf7B57E87bD07C9e1D722E9754be9B"
+      address: "0x5789E643733f688Ee14c3cf075426Dd24Da932CC"
       abi: TToken
-      startBlock: 142216551
+      startBlock: 142170038
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -310,9 +266,9 @@ dataSources:
     name: tSBTC
     network: sei-mainnet
     source:
-      address: "0x413498E8eD8608053DE3f407DBEDd29F19f80c04"
+      address: "0xeeC97fe3ae3dB12D4167d7a3A369875e55b89284"
       abi: TToken
-      startBlock: 150673971
+      startBlock: 149665061
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -353,9 +309,9 @@ dataSources:
     name: tFBTC
     network: sei-mainnet
     source:
-      address: "0x51Be1bAde695f7aDb37ecf597EC2F97ebD99FbFE"
+      address: "0xfb9064394024EB404F79c9b1044F835832724b18"
       abi: TToken
-      startBlock: 150673971
+      startBlock: 150249250
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -396,9 +352,9 @@ dataSources:
     name: tMBTC
     network: sei-mainnet
     source:
-      address: "0x963Db326b734FD58a9396C020BBb52C14acaFb02"
+      address: "0x25B81A6F1b7CFa7c296326e65C6562043954977C"
       abi: TToken
-      startBlock: 152500449
+      startBlock: 152410400
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -439,9 +395,9 @@ dataSources:
     name: tSolvBTC
     network: sei-mainnet
     source:
-      address: "0xA54a39D8d2126C2aaE1622443B30F19414C74f3B"
+      address: "0x786D64616B07ae066dDf18B6534a025cA27f0346"
       abi: TToken
-      startBlock: 150673971
+      startBlock: 150254456
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -478,13 +434,102 @@ dataSources:
         - event: NewMarketInterestRateModel(address,address)
           handler: handleNewMarketInterestRateModel
       file: ./src/ttoken.ts
+
+  - kind: ethereum
+    name: tFRAX
+    network: sei-mainnet
+    source:
+      address: "0xE53122C1DF889B88d25541d77988603D0a53C5A1"
+      abi: TToken
+      startBlock: 131201456
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Account
+        - AccountCToken
+        - LiquidationBorrow
+        - Market
+      abis:
+        - name: TToken
+          file: ./abis/ttoken.json
+        - name: Comptroller
+          file: ./abis/comptroller.json
+        - name: PriceFeed
+          file: ./abis/PriceFeed.json
+        - name: ERC20
+          file: ./abis/erc20.json
+        - name: RERC20
+          file: ./abis/rerc20.json
+      eventHandlers:
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+        - event: AccrueInterest(uint256,uint256,uint256,uint256)
+          handler: handleAccrueInterest
+        - event: NewReserveFactor(uint256,uint256)
+          handler: handleNewReserveFactor
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: NewMarketInterestRateModel(address,address)
+          handler: handleNewMarketInterestRateModel
+      file: ./src/ttoken.ts
+
+  - kind: ethereum
+    name: tUSDC
+    network: sei-mainnet
+    source:
+      address: "0xFb4c72D5A4239462326A5A005860a20CFeD094f4"
+      abi: TToken
+      startBlock: 131201453
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Account
+        - AccountCToken
+        - LiquidationBorrow
+        - Market
+      abis:
+        - name: TToken
+          file: ./abis/ttoken.json
+        - name: Comptroller
+          file: ./abis/comptroller.json
+        - name: PriceFeed
+          file: ./abis/PriceFeed.json
+        - name: ERC20
+          file: ./abis/erc20.json
+        - name: RERC20
+          file: ./abis/rerc20.json
+      eventHandlers:
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+        - event: AccrueInterest(uint256,uint256,uint256,uint256)
+          handler: handleAccrueInterest
+        - event: NewReserveFactor(uint256,uint256)
+          handler: handleNewReserveFactor
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: NewMarketInterestRateModel(address,address)
+          handler: handleNewMarketInterestRateModel
+      file: ./src/ttoken.ts
+
   - kind: ethereum
     name: Comptroller
     network: sei-mainnet
     source:
-      address: "0x71034bf5eC0FAd7aEE81a213403c8892F3d8CAeE"
+      address: "0x16daCd28015C5168B62F27D934b2E11B925cb320"
       abi: Comptroller
-      startBlock: 131220079
+      startBlock: 131201450
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

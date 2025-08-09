@@ -4,11 +4,12 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy takara",
-    "create-local": "graph create --node http://localhost:8020/ takara",
-    "remove-local": "graph remove --node http://localhost:8020/ takara",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 takara",
-    "create-aws": "graph create --node http://ec2-44-220-142-254.compute-1.amazonaws.com:8020/ takara",
+    "deploy": "graph deploy takara-assets-stagging",
+    "auth":"graph auth 7d96f6ce294e29752ecd2597a3297c21",
+    "create-local": "graph create --node http://localhost:8020/ takara-assets-stagging",
+    "remove-local": "graph remove --node http://localhost:8020/ takara-assets-stagging",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 takara-assets-stagging",
+    "create-aws": "graph create --node http://ec2-44-220-142-254.compute-1.amazonaws.com:8020/ takara-assets-stagging",
     "test": "graph test"
   },
   "dependencies": {
